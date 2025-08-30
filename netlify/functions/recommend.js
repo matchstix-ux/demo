@@ -1,4 +1,4 @@
-import cigars from './cigars.json';
+const cigars = JSON.parse(await (await fetch(new URL('./cigars.json', import.meta.url))).text());
 
 const CORS = {
   "access-control-allow-origin": "*",
