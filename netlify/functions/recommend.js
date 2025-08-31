@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-// Helper to detect Cuban cigars (basic: checks if "Cuba" or "Cuban" in origin/country/brand/line)
+// Detect Cuban cigars
 function isCuban(cigar) {
   const check = (field) => {
     if (!field) return false;
@@ -12,11 +12,11 @@ function isCuban(cigar) {
   return (
     check(cigar.origin) ||
     check(cigar.country) ||
-    check(cigar.brand) && cigar.brand.toLowerCase().includes('cuaba') // Exclude the brand Cuaba, a Cuban brand
+    (cigar.brand && cigar.brand.toLowerCase().includes('cuaba'))
   );
 }
 
-// Basic shuffle function
+// Basic array shuffle
 function shuffle(array) {
   let m = array.length, t, i;
   while (m) {
@@ -36,6 +36,7 @@ exports.handler = async function(event, context) {
     "content-type": "application/json"
   };
 
+  // Preflight
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 204, headers: CORS, body: "" };
   }
@@ -44,15 +45,49 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    const { cigarName = "" } = JSON.parse(event.body || "{}");
-    if (!cigarName.trim()) {
-      return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: "Missing cigar name" }) };
+    // Parse user input
+    let cigarName = "";
+    try {
+      cigarName = JSON.parse(event.body || "{}").cigarName || "";
+    } catch(parseErr) {
+      return {
+        statusCode: 400,
+        headers: CORS,
+        body: JSON.stringify({ error: "Bad request", details: "Could not parse request body" })
+      };
     }
 
-    // Read cigars.json from same directory as this function
+    if (!cigarName.trim()) {
+      return {
+        statusCode: 400,
+        headers: CORS,
+        body: JSON.stringify({ error: "Missing cigar name" })
+      };
+    }
+
+    // DEBUG: Log out file existence and path
     const cigarsPath = path.join(__dirname, "cigars.json");
-    const cigarsRaw = fs.readFileSync(cigarsPath, "utf8");
-    const allCigars = JSON.parse(cigarsRaw);
+    let cigarsRaw;
+    let allCigars;
+    try {
+      cigarsRaw = fs.readFileSync(cigarsPath, "utf8");
+    } catch (fileErr) {
+      return {
+        statusCode: 500,
+        headers: CORS,
+        body: JSON.stringify({ error: "Could not read cigars.json", details: fileErr.message, path: cigarsPath })
+      };
+    }
+
+    try {
+      allCigars = JSON.parse(cigarsRaw);
+    } catch (jsonErr) {
+      return {
+        statusCode: 500,
+        headers: CORS,
+        body: JSON.stringify({ error: "cigars.json is not valid JSON", details: jsonErr.message })
+      };
+    }
 
     // Exclude Cuban cigars
     const usCigars = allCigars.filter(c => !isCuban(c));
@@ -60,8 +95,8 @@ exports.handler = async function(event, context) {
     // Normalize input
     const input = cigarName.trim().toLowerCase();
 
-    // Try exact brand+line match
-    let recs = usCigars.filter(c => 
+    // Try exact brand/line match
+    let recs = usCigars.filter(c =>
       (c.name && c.name.toLowerCase().includes(input)) ||
       (c.brand && c.brand.toLowerCase().includes(input))
     );
@@ -86,10 +121,15 @@ exports.handler = async function(event, context) {
       body: JSON.stringify(recs)
     };
   } catch (err) {
+    // Show the actual error!
     return {
       statusCode: 500,
       headers: CORS,
-      body: JSON.stringify({ error: "Server error", details: err.message })
+      body: JSON.stringify({
+        error: "Server error",
+        details: err.message,
+        stack: err.stack
+      })
     };
   }
 };
