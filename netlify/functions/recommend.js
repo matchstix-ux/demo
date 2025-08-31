@@ -1,34 +1,33 @@
-import fs from 'fs';
-
-const CORS = {
-  "access-control-allow-origin": "*",
-  "access-control-allow-methods": "POST,OPTIONS",
-  "access-control-allow-headers": "content-type,authorization",
-  "content-type": "application/json"
-};
-
-function isCuban(brand) {
-  const cubanBrands = [
-    'cohiba', 'montecristo', 'partagas', 'trinidad', 'ramon allones', 'cuaba',
-    'quai d\'orsay', 'sancho panza', 'veguero', 'punch', 'por larranaga', 'juan lopez',
-    'el rey del mundo', 'hoyo de monterrey', 'bolivar', 'h.upmann', 'jose piedra',
-    'quintero', 'la gloria cubana', 'diplomaticos'
-  ];
-  if (!brand) return false;
-  const b = brand.toLowerCase();
-  return cubanBrands.some(cb => b.includes(cb));
-}
-
-function shuffle(arr) {
-  let a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 export default async (req) => {
+  const { default: fs } = await import('fs');
+  const CORS = {
+    "access-control-allow-origin": "*",
+    "access-control-allow-methods": "POST,OPTIONS",
+    "access-control-allow-headers": "content-type,authorization",
+    "content-type": "application/json"
+  };
+
+  function isCuban(brand) {
+    const cubanBrands = [
+      'cohiba', 'montecristo', 'partagas', 'trinidad', 'ramon allones', 'cuaba',
+      'quai d\'orsay', 'sancho panza', 'veguero', 'punch', 'por larranaga', 'juan lopez',
+      'el rey del mundo', 'hoyo de monterrey', 'bolivar', 'h.upmann', 'jose piedra',
+      'quintero', 'la gloria cubana', 'diplomaticos'
+    ];
+    if (!brand) return false;
+    const b = brand.toLowerCase();
+    return cubanBrands.some(cb => b.includes(cb));
+  }
+
+  function shuffle(arr) {
+    let a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
   try {
     if (req.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: CORS });
@@ -37,7 +36,7 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: CORS });
     }
 
-    // Load cigars.json with fs each time for max compatibility
+    // Dynamic import and read cigars.json
     const cigars = JSON.parse(fs.readFileSync(new URL('./cigars.json', import.meta.url), 'utf-8'));
 
     const { cigarName } = await req.json();
