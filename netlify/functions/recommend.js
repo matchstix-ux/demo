@@ -1,5 +1,34 @@
-export default async (req) => {
-  const { default: fs } = await import('fs');
+// netlify/functions/recommend.js
+const fs = require('fs');
+const path = require('path');
+
+// Helper to detect Cuban cigars (basic: checks if "Cuba" or "Cuban" in origin/country/brand/line)
+function isCuban(cigar) {
+  const check = (field) => {
+    if (!field) return false;
+    const str = field.toString().toLowerCase();
+    return str.includes('cuba') || str.includes('cuban');
+  };
+  return (
+    check(cigar.origin) ||
+    check(cigar.country) ||
+    check(cigar.brand) && cigar.brand.toLowerCase().includes('cuaba') // Exclude the brand Cuaba, a Cuban brand
+  );
+}
+
+// Basic shuffle function
+function shuffle(array) {
+  let m = array.length, t, i;
+  while (m) {
+    i = Math.floor(Math.random() * m--);
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+  return array;
+}
+
+exports.handler = async function(event, context) {
   const CORS = {
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "POST,OPTIONS",
@@ -7,54 +36,60 @@ export default async (req) => {
     "content-type": "application/json"
   };
 
-  function isCuban(brand) {
-    const cubanBrands = [
-      'cohiba', 'montecristo', 'partagas', 'trinidad', 'ramon allones', 'cuaba',
-      'quai d\'orsay', 'sancho panza', 'veguero', 'punch', 'por larranaga', 'juan lopez',
-      'el rey del mundo', 'hoyo de monterrey', 'bolivar', 'h.upmann', 'jose piedra',
-      'quintero', 'la gloria cubana', 'diplomaticos'
-    ];
-    if (!brand) return false;
-    const b = brand.toLowerCase();
-    return cubanBrands.some(cb => b.includes(cb));
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 204, headers: CORS, body: "" };
   }
-
-  function shuffle(arr) {
-    let a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
   try {
-    if (req.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: CORS });
-    }
-    if (req.method !== "POST") {
-      return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: CORS });
+    const { cigarName = "" } = JSON.parse(event.body || "{}");
+    if (!cigarName.trim()) {
+      return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: "Missing cigar name" }) };
     }
 
-    // Dynamic import and read cigars.json
-    const cigars = JSON.parse(fs.readFileSync(new URL('./cigars.json', import.meta.url), 'utf-8'));
+    // Read cigars.json from same directory as this function
+    const cigarsPath = path.join(__dirname, "cigars.json");
+    const cigarsRaw = fs.readFileSync(cigarsPath, "utf8");
+    const allCigars = JSON.parse(cigarsRaw);
 
-    const { cigarName } = await req.json();
-    if (!cigarName) {
-      return new Response(JSON.stringify({ error: "Missing cigar name" }), { status: 400, headers: CORS });
-    }
+    // Exclude Cuban cigars
+    const usCigars = allCigars.filter(c => !isCuban(c));
 
-    const usCigars = cigars.filter(c => !isCuban(c.brand));
-    let recs = usCigars.filter(
-      c =>
-        c.name.toLowerCase().includes(cigarName.toLowerCase()) ||
-        c.brand.toLowerCase().includes(cigarName.toLowerCase())
+    // Normalize input
+    const input = cigarName.trim().toLowerCase();
+
+    // Try exact brand+line match
+    let recs = usCigars.filter(c => 
+      (c.name && c.name.toLowerCase().includes(input)) ||
+      (c.brand && c.brand.toLowerCase().includes(input))
     );
+
+    // If none, try by flavor notes
+    if (!recs.length) {
+      recs = usCigars.filter(c =>
+        Array.isArray(c.flavorNotes) &&
+        c.flavorNotes.some(note => input.includes(note.toLowerCase()))
+      );
+    }
+
+    // Shuffle and take up to 3
     recs = shuffle(recs).slice(0, 3);
+
+    // Fallback: 3 random US-market cigars
     if (!recs.length) recs = shuffle(usCigars).slice(0, 3);
 
-    return new Response(JSON.stringify(recs), { status: 200, headers: CORS });
+    return {
+      statusCode: 200,
+      headers: CORS,
+      body: JSON.stringify(recs)
+    };
   } catch (err) {
-    return new Response(JSON.stringify({ error: "Server error", details: err.message }), { status: 500, headers: CORS });
+    return {
+      statusCode: 500,
+      headers: CORS,
+      body: JSON.stringify({ error: "Server error", details: err.message })
+    };
   }
 };
