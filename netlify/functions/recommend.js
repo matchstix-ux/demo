@@ -1,4 +1,4 @@
-const cigars = JSON.parse(await (await fetch(new URL('./cigars.json', import.meta.url))).text());
+import fs from 'fs';
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -36,6 +36,9 @@ export default async (req) => {
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: CORS });
     }
+
+    // Load cigars.json with fs each time for max compatibility
+    const cigars = JSON.parse(fs.readFileSync(new URL('./cigars.json', import.meta.url), 'utf-8'));
 
     const { cigarName } = await req.json();
     if (!cigarName) {
