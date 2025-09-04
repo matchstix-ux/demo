@@ -85,34 +85,15 @@
       <div id="results" class="grid"></div>
     </section>
   </div>
-
-  <script>
-    (async function ensureLogo(){
-      const img = document.getElementById('brandLogo');
-      const candidates = [
-        './logo.svg','./logo.png',
-        '/images/logo.svg','/images/logo.png',
-        '/assets/logo.svg','/assets/logo.png',
-        '/static/logo.svg','/static/logo.png'
-      ];
-      for (const url of candidates) {
-        try {
-          const r = await fetch(url, { method:'HEAD', cache:'no-store' });
-          if (r.ok) { img.src = url; return; }
-        } catch(_) {}
-      }
-      img.style.display = 'none';
-    })();
-    function dismissBanner() {
+<script>
+function dismissBanner() {
   document.getElementById('install-banner').classList.add('hidden');
   localStorage.setItem('banner-dismissed', 'true');
 }
 if (localStorage.getItem('banner-dismissed')) {
   document.getElementById('install-banner').classList.add('hidden');
 }
-
-    // No changes here; app.js is loaded separately
-  </script>
-  <script src="app.js"></script>
+</script>
+<script src="app.js"></script>
 </body>
 </html>
