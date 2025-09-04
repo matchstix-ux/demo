@@ -1,7 +1,7 @@
 // netlify/functions/recommend.js
 
-// Embed the cigar data directly in the function
-const allCigars = [
+// Fallback cigar database (your local data)
+const fallbackCigars = [
   {"name":"Padron 1964 Anniversary Maduro","brand":"Padron","strength":8,"priceRange":"$15-$20","flavorNotes":["Cocoa","Espresso","Earth"]},
   {"name":"Oliva Serie V Melanio","brand":"Oliva","strength":7,"priceRange":"$12-$18","flavorNotes":["Cedar","Spice","Chocolate"]},
   {"name":"EP Carrillo Encore","brand":"EP Carrillo","strength":6,"priceRange":"$11-$16","flavorNotes":["Caramel","Cedar","Earth"]},
@@ -83,7 +83,106 @@ const allCigars = [
   {"name":"Aganorsa Leaf Lunatic Torch","brand":"Aganorsa Leaf","strength":8,"priceRange":"$10-$14","flavorNotes":["Pepper","Earth","Sweetness"]}
 ];
 
-// Detect Cuban cigars
+// OpenAI Configuration
+const OPENAI_CONFIG = {
+  apiKey: process.env.OPENAI_API_KEY,
+  endpoint: "https://api.openai.com/v1/chat/completions",
+  model: "gpt-4o-mini", // Cost-effective model, great for structured data
+  timeout: 8000 // 8 second timeout
+};
+
+// Function to get recommendations from OpenAI
+async function getOpenAIRecommendations(cigarName) {
+  if (!OPENAI_CONFIG.apiKey) {
+    console.log('OpenAI API key not configured, using fallback');
+    return null;
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), OPENAI_CONFIG.timeout);
+
+    // Create a prompt that asks OpenAI to select from our database
+    const prompt = `You are a cigar expert. A user is looking for recommendations based on: "${cigarName}"
+
+Here is my cigar database to choose from:
+${JSON.stringify(fallbackCigars, null, 2)}
+
+Please analyze the user's input and recommend exactly 3 cigars from this database that would be good matches. Consider:
+- If they mention a specific brand/cigar, find similar ones (similar strength, flavor notes)
+- If they mention flavors, find cigars with those or complementary notes
+- If they mention strength preference, match accordingly
+- Provide variety in your selections when possible
+
+Respond with ONLY a valid JSON array of exactly 3 cigar objects from the database above. Do not include any explanation or additional text - just the JSON array.
+
+Example format:
+[
+  {"name":"Cigar Name","brand":"Brand","strength":7,"priceRange":"$10-$15","flavorNotes":["Note1","Note2","Note3"]},
+  {"name":"Cigar Name","brand":"Brand","strength":6,"priceRange":"$8-$12","flavorNotes":["Note1","Note2","Note3"]},
+  {"name":"Cigar Name","brand":"Brand","strength":8,"priceRange":"$12-$18","flavorNotes":["Note1","Note2","Note3"]}
+]`;
+
+    const response = await fetch(OPENAI_CONFIG.endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_CONFIG.apiKey}`
+      },
+      body: JSON.stringify({
+        model: OPENAI_CONFIG.model,
+        messages: [
+          {
+            role: "system",
+            content: "You are a cigar recommendation expert. Always respond with valid JSON arrays only, no additional text."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        max_tokens: 1500,
+        temperature: 0.7
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API returned ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content?.trim();
+    
+    if (!content) {
+      throw new Error('Empty response from OpenAI');
+    }
+
+    // Parse the JSON response
+    try {
+      const recommendations = JSON.parse(content);
+      
+      if (Array.isArray(recommendations) && recommendations.length > 0) {
+        console.log(`OpenAI returned ${recommendations.length} recommendations`);
+        return recommendations.slice(0, 3); // Ensure exactly 3
+      } else {
+        throw new Error('Invalid recommendations format');
+      }
+    } catch (parseError) {
+      console.log('Failed to parse OpenAI response:', parseError.message);
+      console.log('Raw response:', content);
+      return null;
+    }
+
+  } catch (error) {
+    console.log('OpenAI API call failed:', error.message);
+    return null;
+  }
+}
+
+// Detect Cuban cigars (for fallback filtering)
 function isCuban(cigar) {
   const check = (field) => {
     if (!field) return false;
@@ -97,7 +196,7 @@ function isCuban(cigar) {
   );
 }
 
-// Basic array shuffle
+// Utility functions for fallback
 function shuffle(array) {
   let m = array.length, t, i;
   while (m) {
@@ -109,6 +208,76 @@ function shuffle(array) {
   return array;
 }
 
+function calculateSimilarity(cigar1, cigar2) {
+  let score = 0;
+  
+  if (cigar1.strength && cigar2.strength) {
+    const strengthDiff = Math.abs(cigar1.strength - cigar2.strength);
+    if (strengthDiff === 0) score += 3;
+    else if (strengthDiff === 1) score += 2;
+    else if (strengthDiff === 2) score += 1;
+  }
+  
+  if (Array.isArray(cigar1.flavorNotes) && Array.isArray(cigar2.flavorNotes)) {
+    const notes1 = cigar1.flavorNotes.map(n => n.toLowerCase());
+    const notes2 = cigar2.flavorNotes.map(n => n.toLowerCase());
+    const commonNotes = notes1.filter(note => notes2.includes(note));
+    score += commonNotes.length;
+  }
+  
+  return score;
+}
+
+function findSimilarCigars(referenceCigar, availableCigars, count = 2) {
+  const similarities = availableCigars
+    .filter(c => c.name !== referenceCigar.name)
+    .map(cigar => ({
+      cigar,
+      similarity: calculateSimilarity(referenceCigar, cigar)
+    }))
+    .sort((a, b) => b.similarity - a.similarity);
+  
+  return similarities.slice(0, count).map(item => item.cigar);
+}
+
+// Fallback recommendation logic
+function getFallbackRecommendations(cigarName) {
+  const usCigars = fallbackCigars.filter(c => !isCuban(c));
+  const input = cigarName.trim().toLowerCase();
+  let recs = [];
+
+  const exactMatches = usCigars.filter(c =>
+    (c.name && c.name.toLowerCase().includes(input)) ||
+    (c.brand && c.brand.toLowerCase().includes(input))
+  );
+
+  if (exactMatches.length > 0) {
+    const baseMatch = exactMatches[0];
+    recs.push(baseMatch);
+    const similar = findSimilarCigars(baseMatch, usCigars, 2);
+    recs = recs.concat(similar);
+  } else {
+    const flavorMatches = usCigars.filter(c =>
+      Array.isArray(c.flavorNotes) &&
+      c.flavorNotes.some(note => input.includes(note.toLowerCase()))
+    );
+    
+    if (flavorMatches.length > 0) {
+      recs = shuffle(flavorMatches).slice(0, 3);
+    } else {
+      recs = shuffle(usCigars).slice(0, 3);
+    }
+  }
+
+  if (recs.length < 3) {
+    const needed = 3 - recs.length;
+    const remaining = shuffle(usCigars.filter(c => !recs.some(r => r.name === c.name)));
+    recs = recs.concat(remaining.slice(0, needed));
+  }
+
+  return recs.slice(0, 3);
+}
+
 exports.handler = async function(event, context) {
   const CORS = {
     "access-control-allow-origin": "*",
@@ -117,7 +286,6 @@ exports.handler = async function(event, context) {
     "content-type": "application/json"
   };
 
-  // Preflight
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 204, headers: CORS, body: "" };
   }
@@ -127,7 +295,6 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    // Parse user input
     let cigarName = "";
     try {
       cigarName = JSON.parse(event.body || "{}").cigarName || "";
@@ -147,47 +314,44 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Exclude Cuban cigars
-    const usCigars = allCigars.filter(c => !isCuban(c));
+    let recommendations = null;
 
-    // Normalize input
-    const input = cigarName.trim().toLowerCase();
+    // Try OpenAI first
+    console.log('Attempting OpenAI recommendation for:', cigarName);
+    recommendations = await getOpenAIRecommendations(cigarName);
 
-    // Try exact brand/line match
-    let recs = usCigars.filter(c =>
-      (c.name && c.name.toLowerCase().includes(input)) ||
-      (c.brand && c.brand.toLowerCase().includes(input))
-    );
-
-    // If none, try by flavor notes
-    if (!recs.length) {
-      recs = usCigars.filter(c =>
-        Array.isArray(c.flavorNotes) &&
-        c.flavorNotes.some(note => input.includes(note.toLowerCase()))
-      );
+    // Use fallback if OpenAI failed
+    if (!recommendations || recommendations.length === 0) {
+      console.log('OpenAI failed or returned no results, using fallback logic');
+      recommendations = getFallbackRecommendations(cigarName);
+    } else {
+      console.log('OpenAI recommendations successful');
     }
-
-    // Shuffle and take up to 3
-    recs = shuffle(recs).slice(0, 3);
-
-    // Fallback: 3 random US-market cigars
-    if (!recs.length) recs = shuffle(usCigars).slice(0, 3);
 
     return {
       statusCode: 200,
       headers: CORS,
-      body: JSON.stringify(recs)
+      body: JSON.stringify(recommendations)
     };
   } catch (err) {
-    // Show the actual error!
-    return {
-      statusCode: 500,
-      headers: CORS,
-      body: JSON.stringify({
-        error: "Server error",
-        details: err.message,
-        stack: err.stack
-      })
-    };
+    // Final fallback - if everything fails
+    console.error('All systems failed, using emergency fallback:', err.message);
+    try {
+      const fallbackRecs = getFallbackRecommendations(cigarName || "");
+      return {
+        statusCode: 200,
+        headers: CORS,
+        body: JSON.stringify(fallbackRecs)
+      };
+    } catch (fallbackErr) {
+      return {
+        statusCode: 500,
+        headers: CORS,
+        body: JSON.stringify({
+          error: "All systems failed",
+          details: err.message
+        })
+      };
+    }
   }
 };
