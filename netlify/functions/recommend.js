@@ -196,19 +196,18 @@ function isCuban(cigar) {
   );
 }
 
-// Utility functions for fallback
+// FIXED shuffle function - now properly returns the array
 function shuffle(array) {
-  let m = array.length, t, i;
-  while (m) {
-    i = Math.floor(Math.random() * m--);
-    t = array[m];
-    array[m] = array[i];
-    array[i] = t;
+  const shuffled = [...array]; // Create copy to avoid mutating original
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-  return array; 
+  return shuffled;
 }
 
-ffunction calculateSimilarity(cigar1, cigar2) {
+// Basic similarity calculation (deterministic for OpenAI consistency)
+function calculateSimilarity(cigar1, cigar2) {
   let score = 0;
   
   if (cigar1.strength && cigar2.strength) {
@@ -228,6 +227,7 @@ ffunction calculateSimilarity(cigar1, cigar2) {
   return score;
 }
 
+// UPDATED: Find similar cigars with randomness applied at the selection level
 function findSimilarCigars(referenceCigar, availableCigars, count = 2) {
   const similarities = availableCigars
     .filter(c => c.name !== referenceCigar.name)
@@ -237,10 +237,16 @@ function findSimilarCigars(referenceCigar, availableCigars, count = 2) {
     }))
     .sort((a, b) => b.similarity - a.similarity);
   
-  return similarities.slice(0, count).map(item => item.cigar);
+  // Get top candidates (more than needed for randomness)
+  const topCandidates = similarities.slice(0, Math.min(count * 3, similarities.length));
+  
+  // Shuffle the top candidates and pick the requested count
+  const shuffledCandidates = shuffle(topCandidates);
+  
+  return shuffledCandidates.slice(0, count).map(item => item.cigar);
 }
 
-// Fallback recommendation logic
+// UPDATED: Fallback recommendation logic with proper randomness
 function getFallbackRecommendations(cigarName) {
   const usCigars = fallbackCigars.filter(c => !isCuban(c));
   const input = cigarName.trim().toLowerCase();
@@ -252,11 +258,16 @@ function getFallbackRecommendations(cigarName) {
   );
 
   if (exactMatches.length > 0) {
-    const baseMatch = exactMatches[0];
+    // Shuffle exact matches first for variety
+    const shuffledMatches = shuffle(exactMatches);
+    const baseMatch = shuffledMatches[0];
     recs.push(baseMatch);
+    
+    // Find similar cigars with randomness
     const similar = findSimilarCigars(baseMatch, usCigars, 2);
     recs = recs.concat(similar);
   } else {
+    // Handle flavor matches
     const flavorMatches = usCigars.filter(c =>
       Array.isArray(c.flavorNotes) &&
       c.flavorNotes.some(note => input.includes(note.toLowerCase()))
@@ -269,6 +280,7 @@ function getFallbackRecommendations(cigarName) {
     }
   }
 
+  // Fill remaining slots if needed
   if (recs.length < 3) {
     const needed = 3 - recs.length;
     const remaining = shuffle(usCigars.filter(c => !recs.some(r => r.name === c.name)));
