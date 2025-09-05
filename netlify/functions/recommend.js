@@ -509,7 +509,6 @@ const fallbackCigars = [
     flavorNotes: ["cocoa", "coffee", "pepper", "earth"]
   }
 ]
-
 // OpenAI Configuration
 const OPENAI_CONFIG = {
   apiKey: process.env.OPENAI_API_KEY,
@@ -519,11 +518,10 @@ const OPENAI_CONFIG = {
   maxResponseSize: 50000
 };
 
-// FIXED: Input sanitization function
+// Input sanitization function
 function sanitizeInput(input) {
   if (typeof input !== 'string') return '';
   if (input.length > 100) return input.slice(0, 100); // Prevent excessively long inputs
-  // Remove potential prompt injection patterns
   return input.replace(/[<>]/g, '').replace(/\n|\r/g, ' ').trim();
 }
 
@@ -557,10 +555,8 @@ async function getOpenAIRecommendations(cigarName) {
       if (controller) controller.abort();
     }, OPENAI_CONFIG.timeout);
 
-    // Sanitize input to prevent prompt injection
     const sanitizedInput = sanitizeInput(cigarName);
-    
-    // === NEW PROMPT BELOW ===
+
     const prompt = `You are a cigar expert. A user is looking for recommendations based on: "${sanitizedInput}". Recommend exactly 3 cigars that are currently available for sale in the United States. Do NOT include Cuban cigars. Respond with ONLY a valid JSON array of exactly 3 cigar objects, each including: name, brand, wrapper, origin, body (1-5), strength (1-5), priceTier, price, and flavorNotes (array of strings). Do not include any explanation or additional text - just the JSON array.`;
 
     const response = await fetch(OPENAI_CONFIG.endpoint, {
@@ -602,17 +598,14 @@ async function getOpenAIRecommendations(cigarName) {
     }
 
     const data = await response.json();
-    
     if (!data || !data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
       throw new Error('Invalid response structure from OpenAI');
     }
 
     const content = data.choices[0]?.message?.content?.trim();
-    
     if (!content) {
       throw new Error('Empty response from OpenAI');
     }
-
     if (content.length > OPENAI_CONFIG.maxResponseSize) {
       throw new Error('Response content too large');
     }
@@ -622,9 +615,7 @@ async function getOpenAIRecommendations(cigarName) {
       if (content.startsWith('```json')) {
         cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '');
       }
-      
       const recommendations = JSON.parse(cleanContent);
-      
       if (Array.isArray(recommendations) && recommendations.length > 0) {
         if (process.env.NODE_ENV !== 'production') {
           console.log(`OpenAI returned ${recommendations.length} recommendations`);
@@ -651,74 +642,13 @@ async function getOpenAIRecommendations(cigarName) {
   }
 }
 
-
-    const contentLength = response.headers.get('content-length');
-    if (contentLength && parseInt(contentLength) > OPENAI_CONFIG.maxResponseSize) {
-      throw new Error('Response too large');
-    }
-
-    const data = await response.json();
-    
-    if (!data || !data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
-      throw new Error('Invalid response structure from OpenAI');
-    }
-
-    const content = data.choices[0]?.message?.content?.trim();
-    
-    if (!content) {
-      throw new Error('Empty response from OpenAI');
-    }
-
-    if (content.length > OPENAI_CONFIG.maxResponseSize) {
-      throw new Error('Response content too large');
-    }
-
-    try {
-      // FIXED: Strip markdown formatting that OpenAI sometimes adds
-      let cleanContent = content;
-      if (content.startsWith('```json')) {
-        cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-      }
-      
-      const recommendations = JSON.parse(cleanContent);
-      
-      if (Array.isArray(recommendations) && recommendations.length > 0) {
-        if (process.env.NODE_ENV !== 'production') {
-          console.log(`OpenAI returned ${recommendations.length} recommendations`);
-        }
-        return recommendations.slice(0, 3);
-      } else {
-        throw new Error('Invalid recommendations format');
-      }
-    } catch (parseError) {
-      console.warn('Failed to parse OpenAI response:', parseError.message);
-      return null;
-    }
-
-  } catch (error) {
-    // FIXED: Ensure timeout is always cleaned up
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    
-    if (error.name === 'AbortError') {
-      console.warn('OpenAI API call timed out');
-    } else {
-      console.warn('OpenAI API call failed:', error.message);
-    }
-    return null;
-  }
-}
-
-// Detect Cuban cigars with safe string operations
+// Detect Cuban cigars
 function isCuban(cigar) {
   if (!cigar || typeof cigar !== 'object') return false;
-  
   const check = (field) => {
     const str = safeStringOperation(field);
     return str.includes('cuba') || str.includes('cuban');
   };
-  
   return (
     check(cigar.origin) ||
     check(cigar.country) ||
@@ -726,23 +656,22 @@ function isCuban(cigar) {
   );
 }
 
-// FIXED: Fisher-Yates shuffle with correct minus operator
+// Fisher-Yates shuffle
 function shuffle(array) {
   if (!Array.isArray(array)) return [];
   const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) { // FIXED: Was i–
+  for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
 }
 
-// Similarity scoring with FIXED strength matching
+// Similarity scoring
 function calculateSimilarity(c1, c2) {
   if (!c1 || !c2 || typeof c1 !== 'object' || typeof c2 !== 'object') {
     return 0;
   }
-
   let score = 0;
 
   // Wrapper similarity
@@ -790,30 +719,29 @@ function calculateSimilarity(c1, c2) {
     }
   }
 
-  // Body similarity (also important)
+  // Body similarity
   if (typeof c1.body === 'number' && typeof c2.body === 'number') {
     const diff = Math.abs(c1.body - c2.body);
-    if (diff === 0) score += 6; // Exact body match
-    else if (diff === 1) score += 3; // Close body
-    else if (diff === 2) score += 1; // Moderate difference
-    else score -= 2; // Big body difference - small penalty
+    if (diff === 0) score += 6;
+    else if (diff === 1) score += 3;
+    else if (diff === 2) score += 1;
+    else score -= 2;
   }
 
-  // CRITICAL FIX: Strength similarity - now properly weighted and penalized
+  // Strength similarity
   if (typeof c1.strength === 'number' && typeof c2.strength === 'number') {
     const diff = Math.abs(c1.strength - c2.strength);
-    if (diff === 0) score += 10;      // Perfect match: highest weight
-    else if (diff === 1) score += 6;  // Close match: still very good
-    else if (diff === 2) score += 2;  // Moderate: acceptable
-    else if (diff === 3) score -= 4;  // Big difference: significant penalty
-    else if (diff >= 4) score -= 8;   // Huge difference: major penalty
+    if (diff === 0) score += 10;
+    else if (diff === 1) score += 6;
+    else if (diff === 2) score += 2;
+    else if (diff === 3) score -= 4;
+    else if (diff >= 4) score -= 8;
   }
 
   // Flavor notes similarity
   if (Array.isArray(c1.flavorNotes) && Array.isArray(c2.flavorNotes)) {
     const notes1 = c1.flavorNotes.map(n => safeStringOperation(n));
     const notes2 = c2.flavorNotes.map(n => safeStringOperation(n));
-
     const exactMatches = notes1.filter(note => notes2.includes(note));
     score += Math.min(exactMatches.length * 1.5, 5);
 
@@ -823,14 +751,12 @@ function calculateSimilarity(c1, c2) {
       spicy: ['pepper', 'spice', 'cinnamon'],
       coffee: ['coffee', 'espresso']
     };
-
     Object.values(families).forEach(family => {
       const has1 = notes1.some(n => family.includes(n));
       const has2 = notes2.some(n => family.includes(n));
       if (has1 && has2) score += 0.5;
     });
   }
-
   return score;
 }
 
@@ -838,14 +764,11 @@ function calculateSimilarity(c1, c2) {
 function getFallbackRecommendations(cigarName) {
   const usCigars = fallbackCigars.filter(c => !isCuban(c));
   const input = safeStringOperation(cigarName.trim());
-  
   const exactMatches = usCigars.filter(c =>
     (c.name && safeStringOperation(c.name).includes(input)) ||
     (c.brand && safeStringOperation(c.brand).includes(input))
   );
-  
   const excluded = exactMatches.map(c => safeStringOperation(c.name || ''));
-
   let recs = [];
 
   if (exactMatches.length > 0) {
@@ -854,13 +777,10 @@ function getFallbackRecommendations(cigarName) {
       .filter(c => c.name !== base.name && !excluded.includes(safeStringOperation(c.name || '')))
       .map(c => ({ cigar: c, similarity: calculateSimilarity(base, c) }))
       .sort((a, b) => b.similarity - a.similarity);
-    
-    // FIXED: Take best matches even if some are negative, but prefer positive ones
     const goodMatches = candidates.filter(c => c.similarity > 0);
     if (goodMatches.length >= 3) {
       recs = shuffle(goodMatches.slice(0, 12)).slice(0, 3).map(x => x.cigar);
     } else {
-      // If not enough good matches, take the best available (even if negative)
       recs = candidates.slice(0, 3).map(x => x.cigar);
     }
   } else {
@@ -878,9 +798,8 @@ function getFallbackRecommendations(cigarName) {
       !recs.some(r => r.name === c.name) &&
       !excluded.includes(safeStringOperation(c.name || ''))
     );
-    recs.push(...shuffle(remaining).slice(0, 3 - recs.length)); // FIXED: Was …
+    recs.push(...shuffle(remaining).slice(0, 3 - recs.length));
   }
-
   return recs.slice(0, 3);
 }
 
@@ -906,16 +825,14 @@ exports.handler = async function(event, context) {
   try {
     let requestBody = {};
     try {
-      // FIXED: Add size limit to prevent DoS attacks
       const bodySize = event.body ? event.body.length : 0;
-      if (bodySize > 10000) { // 10KB limit
+      if (bodySize > 10000) {
         return {
           statusCode: 413,
           headers: CORS,
           body: JSON.stringify({ error: "Request body too large" })
         };
       }
-      
       requestBody = JSON.parse(event.body || "{}");
       cigarName = requestBody.cigarName || "";
     } catch (parseError) {
@@ -940,7 +857,6 @@ exports.handler = async function(event, context) {
     if (process.env.NODE_ENV !== 'production') {
       console.log("Trying OpenAI recommendation for:", cigarName);
     }
-    
     let recommendations = await getOpenAIRecommendations(cigarName);
 
     if (!recommendations || recommendations.length === 0) {
@@ -958,7 +874,6 @@ exports.handler = async function(event, context) {
 
   } catch (err) {
     console.error("Top-level failure:", err.message);
-    
     try {
       const fallback = getFallbackRecommendations(cigarName || "");
       return { statusCode: 200, headers: CORS, body: JSON.stringify(fallback) };
@@ -975,3 +890,5 @@ exports.handler = async function(event, context) {
     }
   }
 };
+
+
