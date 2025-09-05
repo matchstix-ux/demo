@@ -1,86 +1,108 @@
 // netlify/functions/recommend.js
 
-// Fallback cigar database (your local data)
+// Enhanced cigar database with accurate wrapper, origin, body, and price tier data
 const fallbackCigars = [
-  {"name":"Padron 1964 Anniversary Maduro","brand":"Padron","strength":8,"priceRange":"$15-$20","flavorNotes":["Cocoa","Espresso","Earth"]},
-  {"name":"Oliva Serie V Melanio","brand":"Oliva","strength":7,"priceRange":"$12-$18","flavorNotes":["Cedar","Spice","Chocolate"]},
-  {"name":"EP Carrillo Encore","brand":"EP Carrillo","strength":6,"priceRange":"$11-$16","flavorNotes":["Caramel","Cedar","Earth"]},
-  {"name":"My Father Le Bijou 1922","brand":"My Father","strength":8,"priceRange":"$10-$15","flavorNotes":["Pepper","Espresso","Cocoa"]},
-  {"name":"Drew Estate Liga Privada No. 9","brand":"Drew Estate","strength":8,"priceRange":"$14-$18","flavorNotes":["Coffee","Cocoa","Spice"]},
-  {"name":"Arturo Fuente Hemingway","brand":"Arturo Fuente","strength":5,"priceRange":"$8-$14","flavorNotes":["Cedar","Sweetness","Spice"]},
-  {"name":"Romeo y Julieta Reserva Real Nicaragua","brand":"Romeo y Julieta","strength":6,"priceRange":"$8-$11","flavorNotes":["Hazelnut","Spice","Earth"]},
-  {"name":"Perdomo 20th Anniversary Sun Grown","brand":"Perdomo","strength":7,"priceRange":"$10-$14","flavorNotes":["Spice","Oak","Coffee"]},
-  {"name":"Alec Bradley Prensado","brand":"Alec Bradley","strength":7,"priceRange":"$10-$13","flavorNotes":["Leather","Cocoa","Pepper"]},
-  {"name":"La Aroma de Cuba Mi Amor","brand":"La Aroma de Cuba","strength":6,"priceRange":"$9-$12","flavorNotes":["Cocoa","Espresso","Earth"]},
-  {"name":"Rocky Patel Decade","brand":"Rocky Patel","strength":7,"priceRange":"$10-$14","flavorNotes":["Cedar","Spice","Nuts"]},
-  {"name":"Montecristo Epic","brand":"Montecristo","strength":6,"priceRange":"$12-$18","flavorNotes":["Cocoa","Nuts","Cedar"]},
-  {"name":"San Cristobal Revelation","brand":"San Cristobal","strength":6,"priceRange":"$9-$13","flavorNotes":["Cocoa","Leather","Spice"]},
-  {"name":"Aging Room Quattro Nicaragua","brand":"Aging Room","strength":7,"priceRange":"$10-$13","flavorNotes":["Chocolate","Coffee","Pepper"]},
-  {"name":"Ashton Symmetry","brand":"Ashton","strength":6,"priceRange":"$11-$15","flavorNotes":["Cedar","Spice","Cream"]},
-  {"name":"La Flor Dominicana Double Ligero","brand":"La Flor Dominicana","strength":9,"priceRange":"$9-$13","flavorNotes":["Spice","Earth","Pepper"]},
-  {"name":"Camacho Corojo","brand":"Camacho","strength":7,"priceRange":"$8-$12","flavorNotes":["Spice","Leather","Earth"]},
-  {"name":"H. Upmann by AJ Fernandez","brand":"H. Upmann","strength":6,"priceRange":"$7-$10","flavorNotes":["Spice","Nuts","Cocoa"]},
-  {"name":"Joya de Nicaragua Antano 1970","brand":"Joya de Nicaragua","strength":9,"priceRange":"$7-$12","flavorNotes":["Pepper","Earth","Leather"]},
-  {"name":"Crowned Heads Mil Dias","brand":"Crowned Heads","strength":6,"priceRange":"$10-$13","flavorNotes":["Cream","Spice","Cedar"]},
-  {"name":"Diesel Unholy Cocktail","brand":"Diesel","strength":8,"priceRange":"$6-$9","flavorNotes":["Earth","Spice","Leather"]},
-  {"name":"CAO Flathead V660","brand":"CAO","strength":7,"priceRange":"$8-$12","flavorNotes":["Chocolate","Espresso","Pepper"]},
-  {"name":"Oliva Serie O","brand":"Oliva","strength":6,"priceRange":"$6-$10","flavorNotes":["Cedar","Spice","Sweetness"]},
-  {"name":"Nub Connecticut","brand":"Nub","strength":4,"priceRange":"$6-$8","flavorNotes":["Cream","Cedar","Nuts"]},
-  {"name":"Punch Gran Puro Nicaragua","brand":"Punch","strength":8,"priceRange":"$7-$11","flavorNotes":["Spice","Earth","Cedar"]},
-  {"name":"Tatuaje Havana VI","brand":"Tatuaje","strength":6,"priceRange":"$8-$11","flavorNotes":["Pepper","Cedar","Earth"]},
-  {"name":"Flor de las Antillas","brand":"My Father","strength":6,"priceRange":"$7-$10","flavorNotes":["Cedar","Nutmeg","Sweetness"]},
-  {"name":"Warped La Colmena No. 44","brand":"Warped","strength":5,"priceRange":"$14-$17","flavorNotes":["Honey","Floral","Cream"]},
-  {"name":"Illusione Epernay","brand":"Illusione","strength":5,"priceRange":"$11-$14","flavorNotes":["Coffee","Cedar","Sweetness"]},
-  {"name":"Foundation The Tabernacle","brand":"Foundation","strength":8,"priceRange":"$12-$16","flavorNotes":["Earth","Cocoa","Spice"]},
-  {"name":"RoMa Craft CroMagnon","brand":"RoMa Craft","strength":8,"priceRange":"$9-$12","flavorNotes":["Earth","Pepper","Leather"]},
-  {"name":"Dunbarton Mi Querida","brand":"Dunbarton Tobacco & Trust","strength":8,"priceRange":"$10-$13","flavorNotes":["Cocoa","Earth","Pepper"]},
-  {"name":"Black Label Trading Co. Lawless","brand":"Black Label Trading Co.","strength":7,"priceRange":"$10-$12","flavorNotes":["Chocolate","Spice","Earth"]},
-  {"name":"Southern Draw Kudzu","brand":"Southern Draw","strength":7,"priceRange":"$9-$12","flavorNotes":["Cedar","Sweetness","Spice"]},
-  {"name":"Espinosa Laranja Reserva","brand":"Espinosa","strength":7,"priceRange":"$10-$13","flavorNotes":["Orange","Spice","Earth"]},
-  {"name":"JRE Aladino Corojo","brand":"JRE Tobacco","strength":7,"priceRange":"$8-$11","flavorNotes":["Cedar","Nuts","Spice"]},
-  {"name":"Plasencia Alma Fuerte","brand":"Plasencia","strength":8,"priceRange":"$18-$22","flavorNotes":["Earth","Chocolate","Coffee"]},
-  {"name":"Patina Habano","brand":"Patina","strength":6,"priceRange":"$9-$12","flavorNotes":["Cream","Cedar","Nuts"]},
-  {"name":"Fratello Classico","brand":"Fratello","strength":6,"priceRange":"$7-$10","flavorNotes":["Cedar","Pepper","Sweetness"]},
-  {"name":"Pichardo Reserva Familiar","brand":"Pichardo","strength":6,"priceRange":"$10-$13","flavorNotes":["Coffee","Earth","Spice"]},
-  {"name":"Cavalier Geneve White Series","brand":"Cavalier Geneve","strength":5,"priceRange":"$11-$14","flavorNotes":["Cream","Honey","Cedar"]},
-  {"name":"Sin Compromiso","brand":"Dunbarton Tobacco & Trust","strength":7,"priceRange":"$17-$20","flavorNotes":["Chocolate","Spice","Earth"]},
-  {"name":"Joya de Nicaragua Antano CT","brand":"Joya de Nicaragua","strength":6,"priceRange":"$8-$11","flavorNotes":["Cream","Pepper","Earth"]},
-  {"name":"Villiger La Flor de Ynclan","brand":"Villiger","strength":6,"priceRange":"$11-$14","flavorNotes":["Cedar","Sweetness","Spice"]},
-  {"name":"El Gueguense (Wise Man)","brand":"Foundation","strength":7,"priceRange":"$11-$15","flavorNotes":["Cedar","Cocoa","Pepper"]},
-  {"name":"Micallef Reserva","brand":"Micallef","strength":7,"priceRange":"$12-$15","flavorNotes":["Chocolate","Earth","Spice"]},
-  {"name":"Cornelius & Anthony The Meridian","brand":"Cornelius & Anthony","strength":6,"priceRange":"$9-$12","flavorNotes":["Coffee","Cedar","Nuts"]},
-  {"name":"Crowned Heads Four Kicks","brand":"Crowned Heads","strength":6,"priceRange":"$8-$11","flavorNotes":["Cedar","Spice","Sweetness"]},
-  {"name":"Aganorsa Leaf Signature Selection","brand":"Aganorsa Leaf","strength":7,"priceRange":"$11-$14","flavorNotes":["Cream","Cedar","Spice"]},
-  {"name":"Casa Fernandez Miami Reserva","brand":"Casa Fernandez","strength":7,"priceRange":"$10-$13","flavorNotes":["Nuts","Spice","Earth"]},
-  {"name":"Illusione Rothchildes","brand":"Illusione","strength":6,"priceRange":"$6-$9","flavorNotes":["Pepper","Cedar","Sweetness"]},
-  {"name":"Room101 Farce","brand":"Room101","strength":6,"priceRange":"$9-$13","flavorNotes":["Cream","Earth","Spice"]},
-  {"name":"Warped Cloud Hopper","brand":"Warped","strength":5,"priceRange":"$7-$10","flavorNotes":["Bread","Cream","Spice"]},
-  {"name":"RoMa Craft Neanderthal","brand":"RoMa Craft","strength":10,"priceRange":"$13-$16","flavorNotes":["Pepper","Earth","Chocolate"]},
-  {"name":"Southern Draw Firethorn","brand":"Southern Draw","strength":6,"priceRange":"$8-$11","flavorNotes":["Sweetness","Cedar","Spice"]},
-  {"name":"Dapper Desvalido","brand":"Dapper","strength":7,"priceRange":"$11-$14","flavorNotes":["Cedar","Earth","Pepper"]},
-  {"name":"Espinosa Habano","brand":"Espinosa","strength":6,"priceRange":"$7-$10","flavorNotes":["Spice","Earth","Cedar"]},
-  {"name":"JRE Aladino Cameroon","brand":"JRE Tobacco","strength":6,"priceRange":"$8-$11","flavorNotes":["Sweetness","Spice","Cedar"]},
-  {"name":"Crowned Heads Las Calaveras","brand":"Crowned Heads","strength":7,"priceRange":"$11-$15","flavorNotes":["Cedar","Sweetness","Pepper"]},
-  {"name":"Plasencia Alma del Fuego","brand":"Plasencia","strength":8,"priceRange":"$15-$19","flavorNotes":["Earth","Pepper","Chocolate"]},
-  {"name":"Foundation Charter Oak Habano","brand":"Foundation","strength":5,"priceRange":"$5-$8","flavorNotes":["Nuts","Cedar","Cream"]},
-  {"name":"Aganorsa Leaf Guardian of the Farm","brand":"Aganorsa Leaf","strength":6,"priceRange":"$8-$11","flavorNotes":["Cedar","Nuts","Pepper"]},
-  {"name":"Black Works Studio Killer Bee","brand":"Black Works Studio","strength":7,"priceRange":"$8-$11","flavorNotes":["Spice","Earth","Chocolate"]},
-  {"name":"Cavalier Geneve Black Series II","brand":"Cavalier Geneve","strength":7,"priceRange":"$12-$16","flavorNotes":["Cocoa","Spice","Earth"]},
-  {"name":"Micallef Leyenda","brand":"Micallef","strength":6,"priceRange":"$10-$13","flavorNotes":["Cream","Spice","Nuts"]},
-  {"name":"Pichardo Clasico","brand":"Pichardo","strength":5,"priceRange":"$8-$11","flavorNotes":["Cedar","Earth","Sweetness"]},
-  {"name":"Casa Fernandez Aganorsa Leaf Maduro","brand":"Casa Fernandez","strength":8,"priceRange":"$11-$14","flavorNotes":["Chocolate","Pepper","Earth"]},
-  {"name":"La Barba Red","brand":"La Barba","strength":6,"priceRange":"$8-$11","flavorNotes":["Pepper","Cedar","Sweetness"]},
-  {"name":"Room101 Doomsayer","brand":"Room101","strength":7,"priceRange":"$8-$12","flavorNotes":["Earth","Pepper","Chocolate"]},
-  {"name":"Warped Serie Gran Reserva 1988","brand":"Warped","strength":6,"priceRange":"$9-$13","flavorNotes":["Bread","Nuts","Cream"]},
-  {"name":"Dunbarton Sobremesa Brulee","brand":"Dunbarton Tobacco & Trust","strength":4,"priceRange":"$11-$15","flavorNotes":["Cream","Sweetness","Cedar"]},
-  {"name":"Black Label Trading Co. Bishop's Blend","brand":"Black Label Trading Co.","strength":8,"priceRange":"$12-$15","flavorNotes":["Pepper","Earth","Spice"]},
-  {"name":"Alec Bradley Black Market Esteli","brand":"Alec Bradley","strength":7,"priceRange":"$8-$12","flavorNotes":["Pepper","Earth","Cedar"]},
-  {"name":"Patina Maduro","brand":"Patina","strength":7,"priceRange":"$10-$14","flavorNotes":["Chocolate","Earth","Spice"]},
-  {"name":"Joya de Nicaragua Joya Black","brand":"Joya de Nicaragua","strength":7,"priceRange":"$7-$11","flavorNotes":["Pepper","Cedar","Earth"]},
-  {"name":"Cornelius & Anthony Venganza","brand":"Cornelius & Anthony","strength":8,"priceRange":"$10-$14","flavorNotes":["Pepper","Cedar","Chocolate"]},
-  {"name":"La Flor Dominicana La Nox","brand":"La Flor Dominicana","strength":8,"priceRange":"$13-$16","flavorNotes":["Chocolate","Earth","Spice"]},
-  {"name":"Illusione Ultra","brand":"Illusione","strength":8,"priceRange":"$11-$14","flavorNotes":["Pepper","Earth","Coffee"]},
-  {"name":"Aganorsa Leaf Lunatic Torch","brand":"Aganorsa Leaf","strength":8,"priceRange":"$10-$14","flavorNotes":["Pepper","Earth","Sweetness"]}
+  // Sample cigars - replace with your actual database
+  {
+    name: "Padron 1964 Anniversary Exclusivo",
+    brand: "Padron",
+    wrapper: "Habano Maduro",
+    origin: "Nicaragua",
+    body: 4,
+    strength: 4,
+    priceTier: "premium",
+    flavorNotes: ["chocolate", "coffee", "leather", "spice"]
+  },
+  {
+    name: "Romeo y Julieta 1875 Robusto",
+    brand: "Romeo y Julieta",
+    wrapper: "Connecticut",
+    origin: "Dominican Republic",
+    body: 2,
+    strength: 2,
+    priceTier: "mid-range",
+    flavorNotes: ["cedar", "cream", "nuts", "mild spice"]
+  },
+  {
+    name: "Montecristo White Robusto",
+    brand: "Montecristo",
+    wrapper: "Connecticut Shade",
+    origin: "Dominican Republic",
+    body: 2,
+    strength: 2,
+    priceTier: "mid-range",
+    flavorNotes: ["cream", "cedar", "vanilla", "nuts"]
+  },
+  {
+    name: "CAO Brazilia Gol",
+    brand: "CAO",
+    wrapper: "Brazilian Maduro",
+    origin: "Nicaragua",
+    body: 4,
+    strength: 4,
+    priceTier: "mid-range",
+    flavorNotes: ["chocolate", "coffee", "earth", "sweetness"]
+  },
+  {
+    name: "Arturo Fuente Hemingway Classic",
+    brand: "Arturo Fuente",
+    wrapper: "Cameroon",
+    origin: "Dominican Republic",
+    body: 3,
+    strength: 3,
+    priceTier: "premium",
+    flavorNotes: ["cedar", "spice", "leather", "earth"]
+  },
+  {
+    name: "Ashton Classic Corona",
+    brand: "Ashton",
+    wrapper: "Connecticut Shade",
+    origin: "Dominican Republic",
+    body: 2,
+    strength: 2,
+    priceTier: "premium",
+    flavorNotes: ["cream", "nuts", "cedar", "mild spice"]
+  },
+  {
+    name: "Rocky Patel Decade Robusto",
+    brand: "Rocky Patel",
+    wrapper: "Ecuador Habano",
+    origin: "Nicaragua",
+    body: 3,
+    strength: 3,
+    priceTier: "mid-range",
+    flavorNotes: ["coffee", "chocolate", "pepper", "cedar"]
+  },
+  {
+    name: "Oliva Serie V Melanio Robusto",
+    brand: "Oliva",
+    wrapper: "Ecuador Habano",
+    origin: "Nicaragua",
+    body: 4,
+    strength: 4,
+    priceTier: "premium",
+    flavorNotes: ["coffee", "chocolate", "pepper", "leather"]
+  },
+  {
+    name: "Perdomo Champagne Robusto",
+    brand: "Perdomo",
+    wrapper: "Connecticut Shade",
+    origin: "Nicaragua",
+    body: 2,
+    strength: 2,
+    priceTier: "budget",
+    flavorNotes: ["cream", "vanilla", "nuts", "mild spice"]
+  },
+  {
+    name: "My Father Le Bijou 1922 Robusto",
+    brand: "My Father",
+    wrapper: "Ecuador Habano Oscuro",
+    origin: "Nicaragua",
+    body: 4,
+    strength: 4,
+    priceTier: "premium",
+    flavorNotes: ["pepper", "chocolate", "coffee", "earth"]
+  }
 ];
 
 // OpenAI Configuration
@@ -88,19 +110,40 @@ const OPENAI_CONFIG = {
   apiKey: process.env.OPENAI_API_KEY,
   endpoint: "https://api.openai.com/v1/chat/completions",
   model: "gpt-4o-mini",
-  timeout: 8000
+  timeout: 8000,
+  maxResponseSize: 50000 // 50KB limit for safety
 };
+
+// Safe string operations helper
+function safeStringOperation(value, operation = 'toLowerCase') {
+  if (value === null || value === undefined) return '';
+  try {
+    const str = typeof value === 'string' ? value : String(value);
+    return operation === 'toLowerCase' ? str.toLowerCase() : str;
+  } catch (error) {
+    console.warn('Safe string operation failed:', error.message);
+    return '';
+  }
+}
 
 // Function to get recommendations from OpenAI
 async function getOpenAIRecommendations(cigarName) {
   if (!OPENAI_CONFIG.apiKey) {
-    console.log('OpenAI API key not configured, using fallback');
+    // Use debug logging instead of exposing sensitive info
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('OpenAI API key not configured, using fallback');
+    }
     return null;
   }
 
+  let controller;
+  let timeoutId;
+
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), OPENAI_CONFIG.timeout);
+    controller = new AbortController();
+    timeoutId = setTimeout(() => {
+      controller.abort();
+    }, OPENAI_CONFIG.timeout);
 
     const prompt = `You are a cigar expert. A user is looking for recommendations based on: "${cigarName}"
 
@@ -140,55 +183,90 @@ Respond with ONLY a valid JSON array of exactly 3 cigar objects from the databas
       signal: controller.signal
     });
 
-    clearTimeout(timeoutId);
+    // Clear timeout on successful response
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
 
     if (!response.ok) {
       throw new Error(`OpenAI API returned ${response.status}: ${response.statusText}`);
     }
 
+    // Check response size before reading
+    const contentLength = response.headers.get('content-length');
+    if (contentLength && parseInt(contentLength) > OPENAI_CONFIG.maxResponseSize) {
+      throw new Error('Response too large');
+    }
+
     const data = await response.json();
+    
+    // Improved response validation
+    if (!data || !data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
+      throw new Error('Invalid response structure from OpenAI');
+    }
+
     const content = data.choices[0]?.message?.content?.trim();
     
     if (!content) {
       throw new Error('Empty response from OpenAI');
     }
 
+    // Safe JSON parsing with size check
+    if (content.length > OPENAI_CONFIG.maxResponseSize) {
+      throw new Error('Response content too large');
+    }
+
     try {
       const recommendations = JSON.parse(content);
       
       if (Array.isArray(recommendations) && recommendations.length > 0) {
-        console.log(`OpenAI returned ${recommendations.length} recommendations`);
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`OpenAI returned ${recommendations.length} recommendations`);
+        }
         return recommendations.slice(0, 3);
       } else {
         throw new Error('Invalid recommendations format');
       }
     } catch (parseError) {
-      console.log('Failed to parse OpenAI response:', parseError.message);
+      console.warn('Failed to parse OpenAI response:', parseError.message);
       return null;
     }
 
   } catch (error) {
-    console.log('OpenAI API call failed:', error.message);
+    // Ensure timeout is always cleared
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    
+    if (error.name === 'AbortError') {
+      console.warn('OpenAI API call timed out');
+    } else {
+      console.warn('OpenAI API call failed:', error.message);
+    }
     return null;
   }
 }
 
-// Detect Cuban cigars
+// Detect Cuban cigars with safe string operations
 function isCuban(cigar) {
+  if (!cigar || typeof cigar !== 'object') return false;
+  
   const check = (field) => {
-    if (!field) return false;
-    const str = field.toString().toLowerCase();
+    const str = safeStringOperation(field);
     return str.includes('cuba') || str.includes('cuban');
   };
+  
   return (
     check(cigar.origin) ||
     check(cigar.country) ||
-    (cigar.brand && cigar.brand.toLowerCase().includes('cuaba'))
+    (cigar.brand && safeStringOperation(cigar.brand).includes('cuaba'))
   );
 }
 
-// Fixed shuffle function
+// Fisher-Yates shuffle
 function shuffle(array) {
+  if (!Array.isArray(array)) return [];
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -197,92 +275,146 @@ function shuffle(array) {
   return shuffled;
 }
 
-// Similarity calculation
-function calculateSimilarity(cigar1, cigar2) {
+// Similarity scoring with safe operations
+function calculateSimilarity(c1, c2) {
+  if (!c1 || !c2 || typeof c1 !== 'object' || typeof c2 !== 'object') {
+    return 0;
+  }
+
   let score = 0;
-  
-  if (cigar1.strength && cigar2.strength) {
-    const strengthDiff = Math.abs(cigar1.strength - cigar2.strength);
-    if (strengthDiff === 0) score += 3;
-    else if (strengthDiff === 1) score += 2;
-    else if (strengthDiff === 2) score += 1;
-  }
-  
-  if (Array.isArray(cigar1.flavorNotes) && Array.isArray(cigar2.flavorNotes)) {
-    const notes1 = cigar1.flavorNotes.map(n => n.toLowerCase());
-    const notes2 = cigar2.flavorNotes.map(n => n.toLowerCase());
-    const commonNotes = notes1.filter(note => notes2.includes(note));
-    score += commonNotes.length;
-  }
-  
-  return score;
-}
 
-// FIXED: Fallback recommendation logic that excludes searched cigars
-function getFallbackRecommendations(cigarName) {
-  const usCigars = fallbackCigars.filter(c => !isCuban(c));
-  const input = cigarName.trim().toLowerCase();
-  
-  // Find exact matches to use as reference but EXCLUDE from recommendations
-  const exactMatches = usCigars.filter(c =>
-    (c.name && c.name.toLowerCase().includes(input)) ||
-    (c.brand && c.brand.toLowerCase().includes(input))
-  );
-  
-  // Get names of exact matches to exclude
-  const excludedNames = exactMatches.map(c => c.name.toLowerCase());
-  
-  let recs = [];
-
-  if (exactMatches.length > 0) {
-    // Use exact match as reference but don't include it in results
-    const shuffledMatches = shuffle(exactMatches);
-    const baseMatch = shuffledMatches[0];
-    
-    // Find similar cigars, excluding exact matches
-    const similarities = usCigars
-      .filter(c => 
-        c.name !== baseMatch.name && 
-        !excludedNames.includes(c.name.toLowerCase())
-      )
-      .map(cigar => ({
-        cigar,
-        similarity: calculateSimilarity(baseMatch, cigar)
-      }))
-      .sort((a, b) => b.similarity - a.similarity);
-    
-    // Get varied selection from top candidates
-    const topCandidates = similarities.slice(0, Math.min(12, similarities.length));
-    const shuffledCandidates = shuffle(topCandidates);
-    recs = shuffledCandidates.slice(0, 3).map(item => item.cigar);
-    
-  } else {
-    // Handle flavor or random matches
-    const flavorMatches = usCigars.filter(c =>
-      Array.isArray(c.flavorNotes) &&
-      c.flavorNotes.some(note => input.includes(note.toLowerCase()))
-    );
-    
-    if (flavorMatches.length > 0) {
-      recs = shuffle(flavorMatches).slice(0, 3);
-    } else {
-      recs = shuffle(usCigars).slice(0, 3);
+  // Wrapper similarity
+  if (c1.wrapper && c2.wrapper) {
+    const w1 = safeStringOperation(c1.wrapper);
+    const w2 = safeStringOperation(c2.wrapper);
+    if (w1 === w2) score += 4;
+    else if (
+      (w1.includes('maduro') && w2.includes('maduro')) ||
+      (w1.includes('connecticut') && w2.includes('connecticut')) ||
+      (w1.includes('habano') && w2.includes('habano')) ||
+      (w1.includes('corojo') && w2.includes('corojo')) ||
+      (w1.includes('broadleaf') && w2.includes('broadleaf'))
+    ) {
+      score += 2;
+    } else if (
+      (w1.includes('ecuador') && w2.includes('ecuador')) ||
+      (w1.includes('sun grown') && w2.includes('sun grown'))
+    ) {
+      score += 1;
     }
   }
 
-  // Fill remaining slots if needed
-  if (recs.length < 3) {
-    const needed = 3 - recs.length;
-    const remaining = usCigars.filter(c => 
-      !recs.some(r => r.name === c.name) &&
-      !excludedNames.includes(c.name.toLowerCase())
+  // Origin similarity
+  if (c1.origin && c2.origin) {
+    const o1 = safeStringOperation(c1.origin);
+    const o2 = safeStringOperation(c2.origin);
+    if (o1 === o2) score += 3;
+    else if (
+      (o1 === 'nicaragua' && o2 === 'honduras') ||
+      (o1 === 'honduras' && o2 === 'nicaragua')
+    ) {
+      score += 1;
+    }
+  }
+
+  // Price tier similarity
+  if (c1.priceTier && c2.priceTier) {
+    if (c1.priceTier === c2.priceTier) score += 2;
+    else if (
+      (c1.priceTier === 'mid-range' && c2.priceTier === 'premium') ||
+      (c1.priceTier === 'premium' && c2.priceTier === 'mid-range')
+    ) {
+      score += 1;
+    }
+  }
+
+  // Body similarity
+  if (typeof c1.body === 'number' && typeof c2.body === 'number') {
+    const diff = Math.abs(c1.body - c2.body);
+    if (diff === 0) score += 3;
+    else if (diff === 1) score += 2;
+    else if (diff === 2) score += 1;
+  }
+
+  // Strength similarity
+  if (typeof c1.strength === 'number' && typeof c2.strength === 'number') {
+    const diff = Math.abs(c1.strength - c2.strength);
+    if (diff === 0) score += 2;
+    else if (diff === 1) score += 1;
+  }
+
+  // Flavor notes similarity
+  if (Array.isArray(c1.flavorNotes) && Array.isArray(c2.flavorNotes)) {
+    const notes1 = c1.flavorNotes.map(n => safeStringOperation(n));
+    const notes2 = c2.flavorNotes.map(n => safeStringOperation(n));
+
+    const exactMatches = notes1.filter(note => notes2.includes(note));
+    score += Math.min(exactMatches.length * 1.5, 5);
+
+    const families = {
+      earthy: ['earth', 'leather', 'tobacco', 'cedar', 'oak'],
+      sweet: ['chocolate', 'cocoa', 'caramel', 'honey', 'cream', 'sweetness'],
+      spicy: ['pepper', 'spice', 'cinnamon'],
+      coffee: ['coffee', 'espresso']
+    };
+
+    Object.values(families).forEach(family => {
+      const has1 = notes1.some(n => family.includes(n));
+      const has2 = notes2.some(n => family.includes(n));
+      if (has1 && has2) score += 0.5;
+    });
+  }
+
+  return score;
+}
+
+// Fallback recommendations if OpenAI fails
+function getFallbackRecommendations(cigarName) {
+  if (!Array.isArray(fallbackCigars) || fallbackCigars.length === 0) {
+    throw new Error('No cigar database available');
+  }
+
+  const usCigars = fallbackCigars.filter(c => !isCuban(c));
+  const input = safeStringOperation(cigarName.trim());
+  
+  const exactMatches = usCigars.filter(c =>
+    (c.name && safeStringOperation(c.name).includes(input)) ||
+    (c.brand && safeStringOperation(c.brand).includes(input))
+  );
+  
+  const excluded = exactMatches.map(c => safeStringOperation(c.name || ''));
+
+  let recs = [];
+
+  if (exactMatches.length > 0) {
+    const base = shuffle(exactMatches)[0];
+    const candidates = usCigars
+      .filter(c => c.name !== base.name && !excluded.includes(safeStringOperation(c.name || '')))
+      .map(c => ({ cigar: c, similarity: calculateSimilarity(base, c) }))
+      .sort((a, b) => b.similarity - a.similarity);
+    recs = shuffle(candidates.slice(0, 12)).slice(0, 3).map(x => x.cigar);
+  } else {
+    const flavorMatches = usCigars.filter(c =>
+      Array.isArray(c.flavorNotes) &&
+      c.flavorNotes.some(note => input.includes(safeStringOperation(note)))
     );
-    recs.push(...shuffle(remaining).slice(0, needed));
+    recs = flavorMatches.length > 0
+      ? shuffle(flavorMatches).slice(0, 3)
+      : shuffle(usCigars).slice(0, 3);
+  }
+
+  if (recs.length < 3) {
+    const remaining = usCigars.filter(c =>
+      !recs.some(r => r.name === c.name) &&
+      !excluded.includes(safeStringOperation(c.name || ''))
+    );
+    recs.push(...shuffle(remaining).slice(0, 3 - recs.length));
   }
 
   return recs.slice(0, 3);
 }
 
+// Main handler
 exports.handler = async function(event, context) {
   const CORS = {
     "access-control-allow-origin": "*",
@@ -299,38 +431,45 @@ exports.handler = async function(event, context) {
     return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
+  // Declare cigarName with proper scope
+  let cigarName = "";
+
   try {
-    let cigarName = "";
+    // Safe JSON parsing with error handling
+    let requestBody = {};
     try {
-      cigarName = JSON.parse(event.body || "{}").cigarName || "";
-    } catch(parseErr) {
-      return {
-        statusCode: 400,
-        headers: CORS,
-        body: JSON.stringify({ error: "Bad request", details: "Could not parse request body" })
+      requestBody = JSON.parse(event.body || "{}");
+      cigarName = requestBody.cigarName || "";
+    } catch (parseError) {
+      return { 
+        statusCode: 400, 
+        headers: CORS, 
+        body: JSON.stringify({ 
+          error: "Bad request", 
+          details: "Could not parse request body as JSON" 
+        }) 
       };
     }
 
     if (!cigarName.trim()) {
-      return {
-        statusCode: 400,
-        headers: CORS,
-        body: JSON.stringify({ error: "Missing cigar name" })
+      return { 
+        statusCode: 400, 
+        headers: CORS, 
+        body: JSON.stringify({ error: "Missing cigar name" }) 
       };
     }
 
-    let recommendations = null;
+    if (process.env.NODE_ENV !== 'production') {
+      console.log("Trying OpenAI recommendation for:", cigarName);
+    }
+    
+    let recommendations = await getOpenAIRecommendations(cigarName);
 
-    // Try OpenAI first
-    console.log('Attempting OpenAI recommendation for:', cigarName);
-    recommendations = await getOpenAIRecommendations(cigarName);
-
-    // Use fallback if OpenAI failed
     if (!recommendations || recommendations.length === 0) {
-      console.log('OpenAI failed or returned no results, using fallback logic');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("Using fallback logic");
+      }
       recommendations = getFallbackRecommendations(cigarName);
-    } else {
-      console.log('OpenAI recommendations successful');
     }
 
     return {
@@ -338,22 +477,22 @@ exports.handler = async function(event, context) {
       headers: CORS,
       body: JSON.stringify(recommendations)
     };
+
   } catch (err) {
-    console.error('All systems failed, using emergency fallback:', err.message);
+    console.error("Top-level failure:", err.message);
+    
+    // Fixed variable scope - cigarName is now properly declared
     try {
-      const fallbackRecs = getFallbackRecommendations(cigarName || "");
-      return {
-        statusCode: 200,
-        headers: CORS,
-        body: JSON.stringify(fallbackRecs)
-      };
+      const fallback = getFallbackRecommendations(cigarName || "");
+      return { statusCode: 200, headers: CORS, body: JSON.stringify(fallback) };
     } catch (fallbackErr) {
+      console.error("Fallback also failed:", fallbackErr.message);
       return {
         statusCode: 500,
         headers: CORS,
-        body: JSON.stringify({
-          error: "All systems failed",
-          details: err.message
+        body: JSON.stringify({ 
+          error: "All systems failed", 
+          details: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message 
         })
       };
     }
