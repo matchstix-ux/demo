@@ -2,8 +2,9 @@
   
 // Enhanced cigar database with price field added
 const fallbackCigars = [
+ [
   {
-    name: "Padron 1964 Anniversary Exclusivo",
+    name: "Padron 1964 Anniversary",
     brand: "Padron",
     wrapper: "Habano Maduro",
     origin: "Nicaragua",
@@ -14,7 +15,7 @@ const fallbackCigars = [
     flavorNotes: ["chocolate", "coffee", "leather", "spice"]
   },
   {
-    name: "Romeo y Julieta 1875 Robusto",
+    name: "Romeo y Julieta 1875",
     brand: "Romeo y Julieta",
     wrapper: "Connecticut",
     origin: "Dominican Republic",
@@ -25,7 +26,7 @@ const fallbackCigars = [
     flavorNotes: ["cedar", "cream", "nuts", "mild spice"]
   },
   {
-    name: "Montecristo White Robusto",
+    name: "Montecristo White",
     brand: "Montecristo",
     wrapper: "Connecticut Shade",
     origin: "Dominican Republic",
@@ -36,7 +37,7 @@ const fallbackCigars = [
     flavorNotes: ["cream", "cedar", "vanilla", "nuts"]
   },
   {
-    name: "CAO Brazilia Gol",
+    name: "CAO Brazilia",
     brand: "CAO",
     wrapper: "Brazilian Maduro",
     origin: "Nicaragua",
@@ -47,7 +48,7 @@ const fallbackCigars = [
     flavorNotes: ["chocolate", "coffee", "earth", "sweetness"]
   },
   {
-    name: "Arturo Fuente Hemingway Classic",
+    name: "Arturo Fuente Hemingway",
     brand: "Arturo Fuente",
     wrapper: "Cameroon",
     origin: "Dominican Republic",
@@ -58,7 +59,7 @@ const fallbackCigars = [
     flavorNotes: ["cedar", "spice", "leather", "earth"]
   },
   {
-    name: "Ashton Classic Corona",
+    name: "Ashton Classic",
     brand: "Ashton",
     wrapper: "Connecticut Shade",
     origin: "Dominican Republic",
@@ -69,7 +70,7 @@ const fallbackCigars = [
     flavorNotes: ["cream", "nuts", "cedar", "mild spice"]
   },
   {
-    name: "Rocky Patel Decade Robusto",
+    name: "Rocky Patel Decade",
     brand: "Rocky Patel",
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
@@ -80,7 +81,7 @@ const fallbackCigars = [
     flavorNotes: ["coffee", "chocolate", "pepper", "cedar"]
   },
   {
-    name: "Oliva Serie V Melanio Robusto",
+    name: "Oliva Serie V Melanio",
     brand: "Oliva",
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
@@ -91,7 +92,7 @@ const fallbackCigars = [
     flavorNotes: ["coffee", "chocolate", "pepper", "leather"]
   },
   {
-    name: "Perdomo Champagne Robusto",
+    name: "Perdomo Champagne",
     brand: "Perdomo",
     wrapper: "Connecticut Shade",
     origin: "Nicaragua",
@@ -102,7 +103,7 @@ const fallbackCigars = [
     flavorNotes: ["cream", "vanilla", "nuts", "mild spice"]
   },
   {
-    name: "My Father Le Bijou 1922 Robusto",
+    name: "My Father Le Bijou 1922",
     brand: "My Father",
     wrapper: "Ecuador Habano Oscuro",
     origin: "Nicaragua",
@@ -113,7 +114,7 @@ const fallbackCigars = [
     flavorNotes: ["pepper", "chocolate", "coffee", "earth"]
   },
   {
-    name: "Drew Estate Liga Privada No. 9 Toro",
+    name: "Drew Estate Liga Privada No. 9",
     brand: "Drew Estate",
     wrapper: "Connecticut Broadleaf",
     origin: "Nicaragua",
@@ -124,7 +125,7 @@ const fallbackCigars = [
     flavorNotes: ["espresso", "cocoa", "pepper", "earth"]
   },
   {
-    name: "Alec Bradley Prensado Churchill",
+    name: "Alec Bradley Prensado",
     brand: "Alec Bradley",
     wrapper: "Honduran Corojo",
     origin: "Honduras",
@@ -135,7 +136,7 @@ const fallbackCigars = [
     flavorNotes: ["chocolate", "spice", "coffee", "oak"]
   },
   {
-    name: "La Aroma de Cuba Mi Amor Belicoso",
+    name: "La Aroma de Cuba Mi Amor",
     brand: "La Aroma de Cuba",
     wrapper: "San Andres Maduro",
     origin: "Nicaragua",
@@ -146,7 +147,7 @@ const fallbackCigars = [
     flavorNotes: ["cocoa", "pepper", "earth", "espresso"]
   },
   {
-    name: "San Cristobal Revelation Legend",
+    name: "San Cristobal Revelation",
     brand: "San Cristobal",
     wrapper: "Ecuador Sumatra",
     origin: "Nicaragua",
@@ -157,7 +158,7 @@ const fallbackCigars = [
     flavorNotes: ["cedar", "cocoa", "nuts", "spice"]
   },
   {
-    name: "EP Carrillo Encore Majestic",
+    name: "EP Carrillo Encore",
     brand: "EP Carrillo",
     wrapper: "Nicaraguan",
     origin: "Nicaragua",
@@ -168,7 +169,7 @@ const fallbackCigars = [
     flavorNotes: ["cedar", "caramel", "cream", "spice"]
   },
   {
-    name: "Camacho Corojo Robusto",
+    name: "Camacho Corojo",
     brand: "Camacho",
     wrapper: "Honduran Corojo",
     origin: "Honduras",
@@ -179,7 +180,7 @@ const fallbackCigars = [
     flavorNotes: ["cedar", "leather", "pepper", "earth"]
   },
   {
-    name: "Joya de Nicaragua Antaño 1970 Robusto",
+    name: "Joya de Nicaragua Antaño 1970",
     brand: "Joya de Nicaragua",
     wrapper: "Nicaraguan Habano",
     origin: "Nicaragua",
@@ -190,7 +191,7 @@ const fallbackCigars = [
     flavorNotes: ["pepper", "leather", "earth", "cocoa"]
   },
   {
-    name: "Aging Room Quattro Nicaragua Maestro",
+    name: "Aging Room Quattro Nicaragua",
     brand: "Aging Room",
     wrapper: "Nicaraguan",
     origin: "Nicaragua",
@@ -201,7 +202,7 @@ const fallbackCigars = [
     flavorNotes: ["cedar", "cocoa", "earth", "spice"]
   },
   {
-    name: "Davidoff Nicaragua Toro",
+    name: "Davidoff Nicaragua",
     brand: "Davidoff",
     wrapper: "Nicaraguan Habano",
     origin: "Nicaragua",
@@ -212,7 +213,7 @@ const fallbackCigars = [
     flavorNotes: ["white pepper", "leather", "coffee", "earth"]
   },
   {
-    name: "Tatuaje Miami Reserva J21",
+    name: "Tatuaje Miami Reserva",
     brand: "Tatuaje",
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
@@ -223,7 +224,7 @@ const fallbackCigars = [
     flavorNotes: ["earth", "cedar", "pepper", "leather"]
   },
   {
-    name: "Avo Classic No. 2",
+    name: "Avo Classic",
     brand: "Avo",
     wrapper: "Ecuador Connecticut",
     origin: "Dominican Republic",
@@ -234,7 +235,7 @@ const fallbackCigars = [
     flavorNotes: ["cream", "nuts", "toast", "mild spice"]
   },
   {
-    name: "La Flor Dominicana Double Ligero Chisel",
+    name: "La Flor Dominicana Double Ligero",
     brand: "La Flor Dominicana",
     wrapper: "Ecuador Sumatra",
     origin: "Dominican Republic",
@@ -245,7 +246,7 @@ const fallbackCigars = [
     flavorNotes: ["pepper", "earth", "leather", "spice"]
   },
   {
-    name: "Arturo Fuente Don Carlos Robusto",
+    name: "Arturo Fuente Don Carlos",
     brand: "Arturo Fuente",
     wrapper: "Cameroon",
     origin: "Dominican Republic",
@@ -256,7 +257,7 @@ const fallbackCigars = [
     flavorNotes: ["cedar", "nutmeg", "leather", "sweetness"]
   },
   {
-    name: "Perdomo Lot 23 Maduro Toro",
+    name: "Perdomo Lot 23 Maduro",
     brand: "Perdomo",
     wrapper: "Nicaraguan Maduro",
     origin: "Nicaragua",
@@ -267,7 +268,7 @@ const fallbackCigars = [
     flavorNotes: ["chocolate", "coffee", "earth", "spice"]
   },
   {
-    name: "Flor de las Antillas Toro",
+    name: "Flor de las Antillas",
     brand: "My Father",
     wrapper: "Nicaraguan Sun Grown",
     origin: "Nicaragua",
@@ -278,7 +279,7 @@ const fallbackCigars = [
     flavorNotes: ["cocoa", "pepper", "cedar", "nutmeg"]
   },
   {
-    name: "Macanudo Cafe Hyde Park",
+    name: "Macanudo Cafe",
     brand: "Macanudo",
     wrapper: "Connecticut Shade",
     origin: "Dominican Republic",
@@ -289,7 +290,7 @@ const fallbackCigars = [
     flavorNotes: ["cream", "nuts", "hay", "mild spice"]
   },
   {
-    name: "Cohiba Connecticut Robusto",
+    name: "Cohiba Connecticut",
     brand: "Cohiba",
     wrapper: "Ecuador Connecticut",
     origin: "Dominican Republic",
@@ -300,7 +301,7 @@ const fallbackCigars = [
     flavorNotes: ["cream", "almond", "cedar", "honey"]
   },
   {
-    name: "Alec Bradley Black Market Esteli Toro",
+    name: "Alec Bradley Black Market Esteli",
     brand: "Alec Bradley",
     wrapper: "Nicaraguan",
     origin: "Nicaragua",
@@ -311,7 +312,7 @@ const fallbackCigars = [
     flavorNotes: ["pepper", "earth", "cocoa", "sweet spice"]
   },
   {
-    name: "Punch Rare Corojo Robusto",
+    name: "Punch Rare Corojo",
     brand: "Punch",
     wrapper: "Sumatra",
     origin: "Honduras",
@@ -322,7 +323,7 @@ const fallbackCigars = [
     flavorNotes: ["spice", "earth", "cedar", "sweetness"]
   },
   {
-    name: "Oliva Connecticut Reserve Robusto",
+    name: "Oliva Connecticut Reserve",
     brand: "Oliva",
     wrapper: "Ecuador Connecticut",
     origin: "Nicaragua",
@@ -333,7 +334,7 @@ const fallbackCigars = [
     flavorNotes: ["cream", "toast", "nuts", "mild spice"]
   },
   {
-    name: "Joya de Nicaragua Cuatro Cinco Toro",
+    name: "Joya de Nicaragua Cuatro Cinco",
     brand: "Joya de Nicaragua",
     wrapper: "Nicaraguan",
     origin: "Nicaragua",
@@ -344,7 +345,7 @@ const fallbackCigars = [
     flavorNotes: ["oak", "coffee", "pepper", "dark chocolate"]
   },
   {
-    name: "EP Carrillo Pledge Prequel",
+    name: "EP Carrillo Pledge",
     brand: "EP Carrillo",
     wrapper: "Connecticut Habano",
     origin: "Dominican Republic",
@@ -355,7 +356,7 @@ const fallbackCigars = [
     flavorNotes: ["pepper", "cocoa", "oak", "spice"]
   },
   {
-    name: "H. Upmann 1844 Reserve Toro",
+    name: "H. Upmann 1844 Reserve",
     brand: "H. Upmann",
     wrapper: "Ecuador Habano",
     origin: "Dominican Republic",
@@ -366,7 +367,7 @@ const fallbackCigars = [
     flavorNotes: ["cedar", "earth", "spice", "nuts"]
   },
   {
-    name: "Brick House Toro",
+    name: "Brick House",
     brand: "Brick House",
     wrapper: "Nicaraguan Habano",
     origin: "Nicaragua",
@@ -377,7 +378,7 @@ const fallbackCigars = [
     flavorNotes: ["cedar", "pepper", "nuts", "earth"]
   },
   {
-    name: "Crowned Heads Four Kicks Robusto",
+    name: "Crowned Heads Four Kicks",
     brand: "Crowned Heads",
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
@@ -388,7 +389,7 @@ const fallbackCigars = [
     flavorNotes: ["cedar", "spice", "earth", "toast"]
   },
   {
-    name: "AJ Fernandez New World Oscuro Robusto",
+    name: "AJ Fernandez New World Oscuro",
     brand: "AJ Fernandez",
     wrapper: "Nicaraguan Oscuro",
     origin: "Nicaragua",
@@ -399,7 +400,7 @@ const fallbackCigars = [
     flavorNotes: ["coffee", "pepper", "earth", "dark chocolate"]
   },
   {
-    name: "Kristoff Ligero Maduro Robusto",
+    name: "Kristoff Ligero Maduro",
     brand: "Kristoff",
     wrapper: "Brazilian Maduro",
     origin: "Dominican Republic",
@@ -410,18 +411,18 @@ const fallbackCigars = [
     flavorNotes: ["chocolate", "espresso", "pepper", "earth"]
   },
   {
-    name: "Villiger La Flor de Ynclan Torpedo",
+    name: "Villiger La Flor de Ynclan",
     brand: "Villiger",
     wrapper: "Ecuador",
     origin: "Dominican Republic",
     body: 3,
-    strength: 3,
+    strength: 2,
     priceTier: "mid-range",
     price: "$10-13",
     flavorNotes: ["cream", "cedar", "nutmeg", "sweetness"]
   },
   {
-    name: "Room101 Farce Toro",
+    name: "Room101 Farce",
     brand: "Room101",
     wrapper: "Ecuador Habano",
     origin: "Dominican Republic",
@@ -432,7 +433,7 @@ const fallbackCigars = [
     flavorNotes: ["cedar", "spice", "earth", "nuts"]
   },
   {
-    name: "Hoyo de Monterrey Excalibur No. 1",
+    name: "Hoyo de Monterrey Excalibur",
     brand: "Hoyo de Monterrey",
     wrapper: "Connecticut Shade",
     origin: "Honduras",
@@ -443,7 +444,7 @@ const fallbackCigars = [
     flavorNotes: ["cream", "cedar", "toast", "mild spice"]
   },
   {
-    name: "La Gloria Cubana Serie R No. 5",
+    name: "La Gloria Cubana Serie R",
     brand: "La Gloria Cubana",
     wrapper: "Ecuador Sumatra",
     origin: "Dominican Republic",
@@ -454,7 +455,7 @@ const fallbackCigars = [
     flavorNotes: ["spice", "cedar", "earth", "leather"]
   },
   {
-    name: "Romeo y Julieta Reserva Real Toro",
+    name: "Romeo y Julieta Reserva Real",
     brand: "Romeo y Julieta",
     wrapper: "Ecuador Connecticut",
     origin: "Dominican Republic",
@@ -465,7 +466,7 @@ const fallbackCigars = [
     flavorNotes: ["cream", "nuts", "cedar", "honey"]
   },
   {
-    name: "Foundation Charter Oak Shade Toro",
+    name: "Foundation Charter Oak Shade",
     brand: "Foundation",
     wrapper: "Connecticut Shade",
     origin: "Nicaragua",
@@ -487,7 +488,7 @@ const fallbackCigars = [
     flavorNotes: ["espresso", "pepper", "earth", "chocolate"]
   },
   {
-    name: "Quesada Oktoberfest 2021 Das Boot",
+    name: "Quesada Oktoberfest 2021",
     brand: "Quesada",
     wrapper: "Mexican San Andres",
     origin: "Dominican Republic",
@@ -508,7 +509,7 @@ const fallbackCigars = [
     price: "$6-10",
     flavorNotes: ["cocoa", "coffee", "pepper", "earth"]
   }
-];
+]
 
 // OpenAI Configuration
 const OPENAI_CONFIG = {
