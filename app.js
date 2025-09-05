@@ -12,10 +12,22 @@ function renderCigar(cigar) {
     <div class="card">
       <div class="name">${cigar.name}</div>
       <div class="brand">${cigar.brand}</div>
-      <div class="meta">Strength: ${cigar.strength} &nbsp;|&nbsp; Price: ${cigar.priceRange}</div>
+      <div class="meta">Strength: ${cigar.strength} &nbsp;|&nbsp; Tier: <b>${formatTier(cigar.priceTier)}</b></div>
       <div class="notes">Flavor Notes: ${Array.isArray(cigar.flavorNotes) ? cigar.flavorNotes.join(', ') : ''}</div>
     </div>
   `;
+}
+
+// Helper to display tier with nice formatting
+function formatTier(tier) {
+  if (!tier) return "";
+  switch (tier) {
+    case "luxury": return "Luxury";
+    case "premium": return "Premium";
+    case "mid-range": return "Mid-Range";
+    case "budget": return "Budget";
+    default: return tier.charAt(0).toUpperCase() + tier.slice(1);
+  }
 }
 
 form.onsubmit = async (e) => {
