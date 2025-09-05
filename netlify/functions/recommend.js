@@ -108,20 +108,13 @@ Here is my cigar database to choose from:
 ${JSON.stringify(fallbackCigars, null, 2)}
 
 Please analyze the user's input and recommend exactly 3 cigars from this database that would be good matches. Consider:
-- If they mention a specific brand/cigar, find similar ones (similar strength, flavor notes)
+- If they mention a specific brand/cigar, find similar ones (similar strength, flavor notes)  
 - If they mention flavors, find cigars with those or complementary notes
 - If they mention strength preference, match accordingly
 - Provide variety in your selections when possible
 - DO NOT recommend the exact cigar they searched for
 
-Respond with ONLY a valid JSON array of exactly 3 cigar objects from the database above. Do not include any explanation or additional text - just the JSON array.
-
-Example format:
-[
-  {"name":"Cigar Name","brand":"Brand","strength":7,"priceRange":"$10-$15","flavorNotes":["Note1","Note2","Note3"]},
-  {"name":"Cigar Name","brand":"Brand","strength":6,"priceRange":"$8-$12","flavorNotes":["Note1","Note2","Note3"]},
-  {"name":"Cigar Name","brand":"Brand","strength":8,"priceRange":"$12-$18","flavorNotes":["Note1","Note2","Note3"]}
-]`;
+Respond with ONLY a valid JSON array of exactly 3 cigar objects from the database above. Do not include any explanation or additional text - just the JSON array.`;
 
     const response = await fetch(OPENAI_CONFIG.endpoint, {
       method: 'POST',
@@ -171,7 +164,6 @@ Example format:
       }
     } catch (parseError) {
       console.log('Failed to parse OpenAI response:', parseError.message);
-      console.log('Raw response:', content);
       return null;
     }
 
@@ -226,64 +218,6 @@ function calculateSimilarity(cigar1, cigar2) {
   return score;
 }
 
-// Find similar cigars with variety and exclusion
-function findSimilarCigars(referenceCigar, availableCigars, excludedNames = [], count = 3) {
-  const similarities = availableCigars
-    .filter(c => 
-      c.name !== referenceCigar.name && 
-      !excludedNames.includes(c.name.toLowerCase())
-    )
-    .map(cigar => ({
-      cigar,
-      similarity: calculateSimilarity(referenceCigar, cigar)
-    }))
-    .sort((a, b) => b.similarity - a.similarity);
-  
-  // Get larger pool for variety
-  const poolSize = Math.min(count * 4, similarities.length);
-  const topCandidates = similarities.slice(0, poolSize);
-  
-  // Group by similarity score
-  const similarityGroups = {};
-  topCandidates.forEach(item => {
-    const score = Math.floor(item.similarity);
-    if (!similarityGroups[score]) similarityGroups[score] = [];
-    similarityGroups[score].push(item);
-  });
-  
-  // Select from different tiers for variety
-  const selected = [];
-  const scores = Object.keys(similarityGroups).sort((a, b) => b - a);
-  
-  for (let i = 0; i < count && selected.length < count; i++) {
-    const scoreIndex = i % scores.length;
-    const score = scores[scoreIndex];
-    const group = similarityGroups[score];
-    
-    if (group && group.length > 0) {
-      const shuffledGroup = shuffle(group);
-      const available = shuffledGroup.filter(item => 
-        !selected.some(sel => sel.cigar.name === item.cigar.name)
-      );
-      
-      if (available.length > 0) {
-        selected.push(available[0]);
-      }
-    }
-  }
-  
-  // Fill remaining slots if needed
-  if (selected.length < count) {
-    const remaining = shuffle(topCandidates.filter(item => 
-      !selected.some(sel => sel.cigar.name === item.cigar.name)
-    ));
-    
-    selected.push(...remaining.slice(0, count - selected.length));
-  }
-  
-  return selected.map(item => item.cigar);
-}
-
 // FIXED: Fallback recommendation logic that excludes searched cigars
 function getFallbackRecommendations(cigarName) {
   const usCigars = fallbackCigars.filter(c => !isCuban(c));
@@ -295,90 +229,55 @@ function getFallbackRecommendations(cigarName) {
     (c.brand && c.brand.toLowerCase().includes(input))
   );
   
-  // Get names of exact matches to exclude from recommendations
+  // Get names of exact matches to exclude
   const excludedNames = exactMatches.map(c => c.name.toLowerCase());
   
   let recs = [];
 
   if (exactMatches.length > 0) {
-    // Use an exact match as reference but don't include it in results
+    // Use exact match as reference but don't include it in results
     const shuffledMatches = shuffle(exactMatches);
     const baseMatch = shuffledMatches[0];
     
-    // Find similar cigars, excluding all exact matches
-    recs = findSimilarCigars(baseMatch, usCigars, excludedNames, 3);
+    // Find similar cigars, excluding exact matches
+    const similarities = usCigars
+      .filter(c => 
+        c.name !== baseMatch.name && 
+        !excludedNames.includes(c.name.toLowerCase())
+      )
+      .map(cigar => ({
+        cigar,
+        similarity: calculateSimilarity(baseMatch, cigar)
+      }))
+      .sort((a, b) => b.similarity - a.similarity);
+    
+    // Get varied selection from top candidates
+    const topCandidates = similarities.slice(0, Math.min(12, similarities.length));
+    const shuffledCandidates = shuffle(topCandidates);
+    recs = shuffledCandidates.slice(0, 3).map(item => item.cigar);
+    
   } else {
-    // Handle flavor matches
+    // Handle flavor or random matches
     const flavorMatches = usCigars.filter(c =>
       Array.isArray(c.flavorNotes) &&
       c.flavorNotes.some(note => input.includes(note.toLowerCase()))
     );
     
     if (flavorMatches.length > 0) {
-      // Separate strong vs regular flavor matches
-      const strongMatches = flavorMatches.filter(c => 
-        c.flavorNotes.filter(note => input.includes(note.toLowerCase())).length > 1
-      );
-      const regularMatches = flavorMatches.filter(c => 
-        c.flavorNotes.filter(note => input.includes(note.toLowerCase())).length === 1
-      );
-      
-      // Mix from different tiers
-      const selectedRecs = [];
-      if (strongMatches.length > 0) {
-        selectedRecs.push(...shuffle(strongMatches).slice(0, 1));
-      }
-      if (regularMatches.length > 0) {
-        const needed = 3 - selectedRecs.length;
-        selectedRecs.push(...shuffle(regularMatches).slice(0, needed));
-      }
-      
-      recs = selectedRecs.slice(0, 3);
+      recs = shuffle(flavorMatches).slice(0, 3);
     } else {
-      // Random selection with strength variety
-      const mildCigars = usCigars.filter(c => c.strength <= 5);
-      const mediumCigars = usCigars.filter(c => c.strength > 5 && c.strength <= 7);
-      const strongCigars = usCigars.filter(c => c.strength > 7);
-      
-      const pools = [mildCigars, mediumCigars, strongCigars].filter(pool => pool.length > 0);
-      const selectedRecs = [];
-      
-      for (let i = 0; i < 3 && pools.length > 0; i++) {
-        const poolIndex = i % pools.length;
-        const pool = pools[poolIndex];
-        const shuffledPool = shuffle(pool);
-        const available = shuffledPool.filter(c => 
-          !selectedRecs.some(rec => rec.name === c.name)
-        );
-        
-        if (available.length > 0) {
-          selectedRecs.push(available[0]);
-        }
-      }
-      
-      recs = selectedRecs;
+      recs = shuffle(usCigars).slice(0, 3);
     }
   }
 
-  // Fill remaining slots with variety
+  // Fill remaining slots if needed
   if (recs.length < 3) {
     const needed = 3 - recs.length;
     const remaining = usCigars.filter(c => 
       !recs.some(r => r.name === c.name) &&
       !excludedNames.includes(c.name.toLowerCase())
     );
-    
-    // Add variety in strength
-    const usedStrengths = recs.map(r => Math.floor(r.strength / 2) * 2);
-    const differentStrength = remaining.filter(c => 
-      !usedStrengths.includes(Math.floor(c.strength / 2) * 2)
-    );
-    
-    if (differentStrength.length > 0) {
-      recs.push(...shuffle(differentStrength).slice(0, needed));
-    } else {
-      recs.push(...shuffle(remaining).slice(0, needed));
-    }
+    recs.push(...shuffle(remaining).slice(0, needed));
   }
 
   return recs.slice(0, 3);
@@ -454,3 +353,9 @@ exports.handler = async function(event, context) {
         headers: CORS,
         body: JSON.stringify({
           error: "All systems failed",
+          details: err.message
+        })
+      };
+    }
+  }
+};
