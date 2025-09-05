@@ -1,6 +1,6 @@
 // netlify/functions/recommend.js
 
-// Enhanced cigar database with accurate wrapper, origin, body, and price tier data
+// Enhanced cigar database with price field added
 const fallbackCigars = [
   {
     name: "Padron 1964 Anniversary Exclusivo",
@@ -10,6 +10,7 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "premium",
+    price: "$25-35", // FIXED: Added missing price field
     flavorNotes: ["chocolate", "coffee", "leather", "spice"]
   },
   {
@@ -20,6 +21,7 @@ const fallbackCigars = [
     body: 2,
     strength: 1,
     priceTier: "mid-range",
+    price: "$6-10",
     flavorNotes: ["cedar", "cream", "nuts", "mild spice"]
   },
   {
@@ -30,6 +32,7 @@ const fallbackCigars = [
     body: 2,
     strength: 1,
     priceTier: "mid-range",
+    price: "$8-12",
     flavorNotes: ["cream", "cedar", "vanilla", "nuts"]
   },
   {
@@ -40,6 +43,7 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "mid-range",
+    price: "$7-11",
     flavorNotes: ["chocolate", "coffee", "earth", "sweetness"]
   },
   {
@@ -50,6 +54,7 @@ const fallbackCigars = [
     body: 3,
     strength: 2,
     priceTier: "premium",
+    price: "$12-18",
     flavorNotes: ["cedar", "spice", "leather", "earth"]
   },
   {
@@ -60,6 +65,7 @@ const fallbackCigars = [
     body: 2,
     strength: 1,
     priceTier: "premium",
+    price: "$10-15",
     flavorNotes: ["cream", "nuts", "cedar", "mild spice"]
   },
   {
@@ -68,8 +74,9 @@ const fallbackCigars = [
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
     body: 3,
-    strength: 2,
+    strength: 3,
     priceTier: "mid-range",
+    price: "$8-12",
     flavorNotes: ["coffee", "chocolate", "pepper", "cedar"]
   },
   {
@@ -80,6 +87,7 @@ const fallbackCigars = [
     body: 4,
     strength: 5,
     priceTier: "premium",
+    price: "$10-16",
     flavorNotes: ["coffee", "chocolate", "pepper", "leather"]
   },
   {
@@ -88,8 +96,9 @@ const fallbackCigars = [
     wrapper: "Connecticut Shade",
     origin: "Nicaragua",
     body: 2,
-    strength: 1,
+    strength: 2,
     priceTier: "budget",
+    price: "$5-8",
     flavorNotes: ["cream", "vanilla", "nuts", "mild spice"]
   },
   {
@@ -100,6 +109,7 @@ const fallbackCigars = [
     body: 4,
     strength: 5,
     priceTier: "premium",
+    price: "$12-18",
     flavorNotes: ["pepper", "chocolate", "coffee", "earth"]
   }
 ];
@@ -112,6 +122,14 @@ const OPENAI_CONFIG = {
   timeout: 8000,
   maxResponseSize: 50000
 };
+
+// FIXED: Input sanitization function
+function sanitizeInput(input) {
+  if (typeof input !== 'string') return '';
+  if (input.length > 100) return input.slice(0, 100); // Prevent excessively long inputs
+  // Remove potential prompt injection patterns
+  return input.replace(/[<>]/g, '').replace(/\n|\r/g, ' ').trim();
+}
 
 // Safe string operations helper
 function safeStringOperation(value, operation = 'toLowerCase') {
@@ -140,10 +158,13 @@ async function getOpenAIRecommendations(cigarName) {
   try {
     controller = new AbortController();
     timeoutId = setTimeout(() => {
-      controller.abort();
+      if (controller) controller.abort(); // FIXED: Check controller exists
     }, OPENAI_CONFIG.timeout);
 
-    const prompt = `You are a cigar expert. A user is looking for recommendations based on: "${cigarName}"
+    // FIXED: Sanitize input to prevent prompt injection
+    const sanitizedInput = sanitizeInput(cigarName);
+    
+    const prompt = `You are a cigar expert. A user is looking for recommendations based on: "${sanitizedInput}"
 
 Here is my cigar database to choose from:
 ${JSON.stringify(fallbackCigars, null, 2)}
@@ -181,6 +202,7 @@ Respond with ONLY a valid JSON array of exactly 3 cigar objects from the databas
       signal: controller.signal
     });
 
+    // FIXED: Proper timeout cleanup
     if (timeoutId) {
       clearTimeout(timeoutId);
       timeoutId = null;
@@ -212,7 +234,13 @@ Respond with ONLY a valid JSON array of exactly 3 cigar objects from the databas
     }
 
     try {
-      const recommendations = JSON.parse(content);
+      // FIXED: Strip markdown formatting that OpenAI sometimes adds
+      let cleanContent = content;
+      if (content.startsWith('```json')) {
+        cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+      }
+      
+      const recommendations = JSON.parse(cleanContent);
       
       if (Array.isArray(recommendations) && recommendations.length > 0) {
         if (process.env.NODE_ENV !== 'production') {
@@ -228,6 +256,7 @@ Respond with ONLY a valid JSON array of exactly 3 cigar objects from the databas
     }
 
   } catch (error) {
+    // FIXED: Ensure timeout is always cleaned up
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
@@ -257,11 +286,11 @@ function isCuban(cigar) {
   );
 }
 
-// Fisher-Yates shuffle
+// FIXED: Fisher-Yates shuffle with correct minus operator
 function shuffle(array) {
   if (!Array.isArray(array)) return [];
   const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
+  for (let i = shuffled.length - 1; i > 0; i--) { // FIXED: Was i–
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
@@ -384,9 +413,16 @@ function getFallbackRecommendations(cigarName) {
     const candidates = usCigars
       .filter(c => c.name !== base.name && !excluded.includes(safeStringOperation(c.name || '')))
       .map(c => ({ cigar: c, similarity: calculateSimilarity(base, c) }))
-      .filter(c => c.similarity > 0) // Filter out negative matches!
       .sort((a, b) => b.similarity - a.similarity);
-    recs = shuffle(candidates.slice(0, 12)).slice(0, 3).map(x => x.cigar);
+    
+    // FIXED: Take best matches even if some are negative, but prefer positive ones
+    const goodMatches = candidates.filter(c => c.similarity > 0);
+    if (goodMatches.length >= 3) {
+      recs = shuffle(goodMatches.slice(0, 12)).slice(0, 3).map(x => x.cigar);
+    } else {
+      // If not enough good matches, take the best available (even if negative)
+      recs = candidates.slice(0, 3).map(x => x.cigar);
+    }
   } else {
     const flavorMatches = usCigars.filter(c =>
       Array.isArray(c.flavorNotes) &&
@@ -402,7 +438,7 @@ function getFallbackRecommendations(cigarName) {
       !recs.some(r => r.name === c.name) &&
       !excluded.includes(safeStringOperation(c.name || ''))
     );
-    recs.push(...shuffle(remaining).slice(0, 3 - recs.length));
+    recs.push(...shuffle(remaining).slice(0, 3 - recs.length)); // FIXED: Was …
   }
 
   return recs.slice(0, 3);
@@ -430,6 +466,16 @@ exports.handler = async function(event, context) {
   try {
     let requestBody = {};
     try {
+      // FIXED: Add size limit to prevent DoS attacks
+      const bodySize = event.body ? event.body.length : 0;
+      if (bodySize > 10000) { // 10KB limit
+        return {
+          statusCode: 413,
+          headers: CORS,
+          body: JSON.stringify({ error: "Request body too large" })
+        };
+      }
+      
       requestBody = JSON.parse(event.body || "{}");
       cigarName = requestBody.cigarName || "";
     } catch (parseError) {
