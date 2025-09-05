@@ -1,7 +1,7 @@
 // netlify/functions/recommend.js
 
 // Enhanced cigar database with accurate wrapper, origin, body, and price tier data
-const fallbackCigars = [
+const fallbackCigars = [ 
   {
     name: "Padron 1964 Anniversary Exclusivo",
     brand: "Padron",
