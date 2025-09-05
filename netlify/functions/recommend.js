@@ -52,7 +52,7 @@ const fallbackCigars = [
     wrapper: "Cameroon",
     origin: "Dominican Republic",
     body: 3,
-    strength: 2,
+    strength: 3,
     priceTier: "premium",
     price: "$12-18",
     flavorNotes: ["cedar", "spice", "leather", "earth"]
@@ -74,7 +74,7 @@ const fallbackCigars = [
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
     body: 3,
-    strength: 3,
+    strength: 4,
     priceTier: "mid-range",
     price: "$8-12",
     flavorNotes: ["coffee", "chocolate", "pepper", "cedar"]
