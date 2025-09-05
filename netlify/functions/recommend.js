@@ -1,5 +1,5 @@
 // netlify/functions/recommend.js
-
+  
 // Enhanced cigar database with price field added
 const fallbackCigars = [
   {
