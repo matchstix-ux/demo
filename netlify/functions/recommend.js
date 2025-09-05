@@ -208,7 +208,7 @@ function shuffle(array) {
   return array; 
 }
 
-function calculateSimilarity(cigar1, cigar2) {
+ffunction calculateSimilarity(cigar1, cigar2) {
   let score = 0;
   
   if (cigar1.strength && cigar2.strength) {
@@ -224,6 +224,9 @@ function calculateSimilarity(cigar1, cigar2) {
     const commonNotes = notes1.filter(note => notes2.includes(note));
     score += commonNotes.length;
   }
+  
+  // Add randomness factor
+  score += Math.random() * 0.5;
   
   return score;
 }
