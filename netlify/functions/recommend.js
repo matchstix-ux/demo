@@ -2,14 +2,13 @@
 
 // Enhanced cigar database with accurate wrapper, origin, body, and price tier data
 const fallbackCigars = [
-  // Sample cigars - replace with your actual database
   {
     name: "Padron 1964 Anniversary Exclusivo",
     brand: "Padron",
     wrapper: "Habano Maduro",
     origin: "Nicaragua",
     body: 4,
-    strength: 4, // Medium-full strength
+    strength: 4,
     priceTier: "premium",
     flavorNotes: ["chocolate", "coffee", "leather", "spice"]
   },
@@ -19,7 +18,7 @@ const fallbackCigars = [
     wrapper: "Connecticut",
     origin: "Dominican Republic",
     body: 2,
-    strength: 1, // Very mild strength
+    strength: 1,
     priceTier: "mid-range",
     flavorNotes: ["cedar", "cream", "nuts", "mild spice"]
   },
@@ -29,7 +28,7 @@ const fallbackCigars = [
     wrapper: "Connecticut Shade",
     origin: "Dominican Republic",
     body: 2,
-    strength: 1, // Very mild, creamy
+    strength: 1,
     priceTier: "mid-range",
     flavorNotes: ["cream", "cedar", "vanilla", "nuts"]
   },
@@ -39,7 +38,7 @@ const fallbackCigars = [
     wrapper: "Brazilian Maduro",
     origin: "Nicaragua",
     body: 4,
-    strength: 4, // Medium-full strength
+    strength: 4,
     priceTier: "mid-range",
     flavorNotes: ["chocolate", "coffee", "earth", "sweetness"]
   },
@@ -49,7 +48,7 @@ const fallbackCigars = [
     wrapper: "Cameroon",
     origin: "Dominican Republic",
     body: 3,
-    strength: 2, // Medium body, mild-medium strength
+    strength: 2,
     priceTier: "premium",
     flavorNotes: ["cedar", "spice", "leather", "earth"]
   },
@@ -59,7 +58,7 @@ const fallbackCigars = [
     wrapper: "Connecticut Shade",
     origin: "Dominican Republic",
     body: 2,
-    strength: 1, // Very mild and smooth
+    strength: 1,
     priceTier: "premium",
     flavorNotes: ["cream", "nuts", "cedar", "mild spice"]
   },
@@ -69,7 +68,7 @@ const fallbackCigars = [
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
     body: 3,
-    strength: 2, // Medium body, mild-medium strength
+    strength: 2,
     priceTier: "mid-range",
     flavorNotes: ["coffee", "chocolate", "pepper", "cedar"]
   },
@@ -79,7 +78,7 @@ const fallbackCigars = [
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
     body: 4,
-    strength: 5, // Full strength
+    strength: 5,
     priceTier: "premium",
     flavorNotes: ["coffee", "chocolate", "pepper", "leather"]
   },
@@ -89,7 +88,7 @@ const fallbackCigars = [
     wrapper: "Connecticut Shade",
     origin: "Nicaragua",
     body: 2,
-    strength: 1, // Very mild and creamy
+    strength: 1,
     priceTier: "budget",
     flavorNotes: ["cream", "vanilla", "nuts", "mild spice"]
   },
@@ -99,7 +98,7 @@ const fallbackCigars = [
     wrapper: "Ecuador Habano Oscuro",
     origin: "Nicaragua",
     body: 4,
-    strength: 5, // Full strength pepper bomb
+    strength: 5,
     priceTier: "premium",
     flavorNotes: ["pepper", "chocolate", "coffee", "earth"]
   }
@@ -111,7 +110,7 @@ const OPENAI_CONFIG = {
   endpoint: "https://api.openai.com/v1/chat/completions",
   model: "gpt-4o-mini",
   timeout: 8000,
-  maxResponseSize: 50000 // 50KB limit for safety
+  maxResponseSize: 50000
 };
 
 // Safe string operations helper
@@ -129,7 +128,6 @@ function safeStringOperation(value, operation = 'toLowerCase') {
 // Function to get recommendations from OpenAI
 async function getOpenAIRecommendations(cigarName) {
   if (!OPENAI_CONFIG.apiKey) {
-    // Use debug logging instead of exposing sensitive info
     if (process.env.NODE_ENV !== 'production') {
       console.log('OpenAI API key not configured, using fallback');
     }
@@ -183,7 +181,6 @@ Respond with ONLY a valid JSON array of exactly 3 cigar objects from the databas
       signal: controller.signal
     });
 
-    // Clear timeout on successful response
     if (timeoutId) {
       clearTimeout(timeoutId);
       timeoutId = null;
@@ -193,7 +190,6 @@ Respond with ONLY a valid JSON array of exactly 3 cigar objects from the databas
       throw new Error(`OpenAI API returned ${response.status}: ${response.statusText}`);
     }
 
-    // Check response size before reading
     const contentLength = response.headers.get('content-length');
     if (contentLength && parseInt(contentLength) > OPENAI_CONFIG.maxResponseSize) {
       throw new Error('Response too large');
@@ -201,7 +197,6 @@ Respond with ONLY a valid JSON array of exactly 3 cigar objects from the databas
 
     const data = await response.json();
     
-    // Improved response validation
     if (!data || !data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
       throw new Error('Invalid response structure from OpenAI');
     }
@@ -212,7 +207,6 @@ Respond with ONLY a valid JSON array of exactly 3 cigar objects from the databas
       throw new Error('Empty response from OpenAI');
     }
 
-    // Safe JSON parsing with size check
     if (content.length > OPENAI_CONFIG.maxResponseSize) {
       throw new Error('Response content too large');
     }
@@ -234,7 +228,6 @@ Respond with ONLY a valid JSON array of exactly 3 cigar objects from the databas
     }
 
   } catch (error) {
-    // Ensure timeout is always cleared
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
@@ -370,10 +363,6 @@ function calculateSimilarity(c1, c2) {
 
 // Fallback recommendations if OpenAI fails
 function getFallbackRecommendations(cigarName) {
-  if (!Array.isArray(fallbackCigars) || fallbackCigars.length === 0) {
-    throw new Error('No cigar database available');
-  }
-
   const usCigars = fallbackCigars.filter(c => !isCuban(c));
   const input = safeStringOperation(cigarName.trim());
   
@@ -417,10 +406,10 @@ function getFallbackRecommendations(cigarName) {
 // Main handler
 exports.handler = async function(event, context) {
   const CORS = {
-    "access-control-allow-origin": "*",
-    "access-control-allow-methods": "POST,OPTIONS",
-    "access-control-allow-headers": "content-type,authorization",
-    "content-type": "application/json"
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST,OPTIONS",
+    "Access-Control-Allow-Headers": "content-type,authorization",
+    "Content-Type": "application/json"
   };
 
   if (event.httpMethod === "OPTIONS") {
@@ -431,17 +420,14 @@ exports.handler = async function(event, context) {
     return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
-  try {
-    // Declare cigarName with proper scope
-    let cigarName = "";
-    let requestBody = {};
+  let cigarName = "";
 
-    // Safe JSON parsing with error handling
+  try {
+    let requestBody = {};
     try {
       requestBody = JSON.parse(event.body || "{}");
-      cigarName = (requestBody.cigarName || "").toString().trim();
+      cigarName = requestBody.cigarName || "";
     } catch (parseError) {
-      console.error('JSON parse error:', parseError.message);
       return { 
         statusCode: 400, 
         headers: CORS, 
@@ -452,88 +438,47 @@ exports.handler = async function(event, context) {
       };
     }
 
-    if (!cigarName) {
+    if (!cigarName.trim()) {
       return { 
         statusCode: 400, 
         headers: CORS, 
-        body: JSON.stringify({ error: "Missing or empty cigar name" }) 
+        body: JSON.stringify({ error: "Missing cigar name" }) 
       };
     }
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log("Processing recommendation for:", cigarName);
+      console.log("Trying OpenAI recommendation for:", cigarName);
     }
     
-    let recommendations = [];
+    let recommendations = await getOpenAIRecommendations(cigarName);
 
-    try {
-      recommendations = await getOpenAIRecommendations(cigarName);
-    } catch (aiError) {
-      console.warn('OpenAI error:', aiError.message);
-      recommendations = null;
-    }
-
-    if (!recommendations || !Array.isArray(recommendations) || recommendations.length === 0) {
+    if (!recommendations || recommendations.length === 0) {
       if (process.env.NODE_ENV !== 'production') {
         console.log("Using fallback logic");
       }
-      try {
-        recommendations = getFallbackRecommendations(cigarName);
-      } catch (fallbackError) {
-        console.error('Fallback error:', fallbackError.message);
-        recommendations = fallbackCigars.slice(0, 3); // Ultimate fallback
-      }
-    }
-
-    // Final safety check
-    if (!Array.isArray(recommendations) || recommendations.length === 0) {
-      recommendations = fallbackCigars.slice(0, 3);
-    }
-
-    // Ensure all recommendations are valid objects
-    const validRecommendations = recommendations
-      .filter(rec => rec && typeof rec === 'object' && rec.name)
-      .slice(0, 3);
-
-    if (validRecommendations.length === 0) {
-      throw new Error('No valid recommendations could be generated');
+      recommendations = getFallbackRecommendations(cigarName);
     }
 
     return {
       statusCode: 200,
       headers: CORS,
-      body: JSON.stringify(validRecommendations)
+      body: JSON.stringify(recommendations)
     };
 
   } catch (err) {
-    console.error("Handler error:", err.message, err.stack);
+    console.error("Top-level failure:", err.message);
     
-    // Final emergency fallback
     try {
-      const emergencyRecs = fallbackCigars.slice(0, 3).map(cigar => ({
-        name: cigar.name || "Unknown",
-        brand: cigar.brand || "Unknown",
-        wrapper: cigar.wrapper || "Unknown",
-        origin: cigar.origin || "Unknown",
-        body: cigar.body || 2,
-        strength: cigar.strength || 2,
-        priceTier: cigar.priceTier || "mid-range",
-        flavorNotes: Array.isArray(cigar.flavorNotes) ? cigar.flavorNotes : ["mild"]
-      }));
-      
-      return { 
-        statusCode: 200, 
-        headers: CORS, 
-        body: JSON.stringify(emergencyRecs) 
-      };
-    } catch (emergencyError) {
-      console.error("Emergency fallback failed:", emergencyError.message);
+      const fallback = getFallbackRecommendations(cigarName || "");
+      return { statusCode: 200, headers: CORS, body: JSON.stringify(fallback) };
+    } catch (fallbackErr) {
+      console.error("Fallback also failed:", fallbackErr.message);
       return {
         statusCode: 500,
         headers: CORS,
         body: JSON.stringify({ 
-          error: "Internal server error", 
-          details: process.env.NODE_ENV === 'production' ? 'Service temporarily unavailable' : err.message 
+          error: "All systems failed", 
+          details: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message 
         })
       };
     }
