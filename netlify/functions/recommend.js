@@ -1,4 +1,5 @@
-// FIXED: Enhanced strength similarity scoring
+// CRITICAL FIX: Proper strength matching that prioritizes strength compatibility
+
 function calculateSimilarity(c1, c2) {
   if (!c1 || !c2 || typeof c1 !== 'object' || typeof c2 !== 'object') {
     return 0;
@@ -51,22 +52,23 @@ function calculateSimilarity(c1, c2) {
     }
   }
 
-  // Body similarity (also important)
+  // Body similarity (important)
   if (typeof c1.body === 'number' && typeof c2.body === 'number') {
     const diff = Math.abs(c1.body - c2.body);
-    if (diff === 0) score += 6; // Exact body match
-    else if (diff === 1) score += 3; // Close body
-    else if (diff === 2) score += 1; // Moderate difference
-    else score -= 2; // Big body difference - small penalty
+    if (diff === 0) score += 6;
+    else if (diff === 1) score += 3;
+    else if (diff === 2) score += 1;
+    else score -= 2;
   }
 
-  // FIXED: Strength similarity with better scoring and penalties
+  // CRITICAL FIX: Strength similarity - now properly weighted and penalized
   if (typeof c1.strength === 'number' && typeof c2.strength === 'number') {
     const diff = Math.abs(c1.strength - c2.strength);
-    if (diff === 0) score += 8; // Exact strength match - increased from 2 to 8
-    else if (diff === 1) score += 4; // Close strength - increased from 1 to 4
-    else if (diff === 2) score += 1; // Moderate difference - was not scored before
-    else if (diff >= 3) score -= 3; // Big strength difference - penalty for bad matches
+    if (diff === 0) score += 10;      // Perfect match: highest weight
+    else if (diff === 1) score += 6;  // Close match: still very good
+    else if (diff === 2) score += 2;  // Moderate: acceptable
+    else if (diff === 3) score -= 4;  // Big difference: significant penalty
+    else if (diff >= 4) score -= 8;   // Huge difference: major penalty
   }
 
   // Flavor notes similarity
