@@ -1,6 +1,6 @@
-// netlify/functions/recommend.js 
-  
-// Enhanced cigar database with price field added  
+// netlify/functions/recommend.js
+
+// Enhanced cigar database with price field REMOVED
 const fallbackCigars = [
   {
     name: "Padron 1964 Anniversary",
@@ -10,7 +10,6 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "premium",
-    price: "$25-35",
     flavorNotes: ["chocolate", "coffee", "leather", "spice"]
   },
   {
@@ -21,7 +20,6 @@ const fallbackCigars = [
     body: 2,
     strength: 1,
     priceTier: "mid-range",
-    price: "$6-10",
     flavorNotes: ["cedar", "cream", "nuts", "mild spice"]
   },
   {
@@ -32,7 +30,6 @@ const fallbackCigars = [
     body: 2,
     strength: 1,
     priceTier: "mid-range",
-    price: "$8-12",
     flavorNotes: ["cream", "cedar", "vanilla", "nuts"]
   },
   {
@@ -43,7 +40,6 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "mid-range",
-    price: "$7-11",
     flavorNotes: ["chocolate", "coffee", "earth", "sweetness"]
   },
   {
@@ -54,7 +50,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "premium",
-    price: "$12-18",
     flavorNotes: ["cedar", "spice", "leather", "earth"]
   },
   {
@@ -65,7 +60,6 @@ const fallbackCigars = [
     body: 2,
     strength: 1,
     priceTier: "premium",
-    price: "$10-15",
     flavorNotes: ["cream", "nuts", "cedar", "mild spice"]
   },
   {
@@ -76,7 +70,6 @@ const fallbackCigars = [
     body: 3,
     strength: 4,
     priceTier: "mid-range",
-    price: "$8-12",
     flavorNotes: ["coffee", "chocolate", "pepper", "cedar"]
   },
   {
@@ -87,7 +80,6 @@ const fallbackCigars = [
     body: 4,
     strength: 5,
     priceTier: "premium",
-    price: "$10-16",
     flavorNotes: ["coffee", "chocolate", "pepper", "leather"]
   },
   {
@@ -98,7 +90,6 @@ const fallbackCigars = [
     body: 2,
     strength: 2,
     priceTier: "budget",
-    price: "$5-8",
     flavorNotes: ["cream", "vanilla", "nuts", "mild spice"]
   },
   {
@@ -109,7 +100,6 @@ const fallbackCigars = [
     body: 4,
     strength: 5,
     priceTier: "premium",
-    price: "$12-18",
     flavorNotes: ["pepper", "chocolate", "coffee", "earth"]
   },
   {
@@ -120,7 +110,6 @@ const fallbackCigars = [
     body: 5,
     strength: 5,
     priceTier: "premium",
-    price: "$16-20",
     flavorNotes: ["espresso", "cocoa", "pepper", "earth"]
   },
   {
@@ -131,7 +120,6 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "premium",
-    price: "$10-13",
     flavorNotes: ["chocolate", "spice", "coffee", "oak"]
   },
   {
@@ -142,7 +130,6 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "mid-range",
-    price: "$8-11",
     flavorNotes: ["cocoa", "pepper", "earth", "espresso"]
   },
   {
@@ -153,7 +140,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "mid-range",
-    price: "$7-10",
     flavorNotes: ["cedar", "cocoa", "nuts", "spice"]
   },
   {
@@ -164,7 +150,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "mid-range",
-    price: "$10-14",
     flavorNotes: ["cedar", "caramel", "cream", "spice"]
   },
   {
@@ -175,7 +160,6 @@ const fallbackCigars = [
     body: 4,
     strength: 5,
     priceTier: "mid-range",
-    price: "$7-11",
     flavorNotes: ["cedar", "leather", "pepper", "earth"]
   },
   {
@@ -186,7 +170,6 @@ const fallbackCigars = [
     body: 5,
     strength: 5,
     priceTier: "budget",
-    price: "$6-9",
     flavorNotes: ["pepper", "leather", "earth", "cocoa"]
   },
   {
@@ -197,7 +180,6 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "mid-range",
-    price: "$9-13",
     flavorNotes: ["cedar", "cocoa", "earth", "spice"]
   },
   {
@@ -208,7 +190,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "luxury",
-    price: "$22-28",
     flavorNotes: ["white pepper", "leather", "coffee", "earth"]
   },
   {
@@ -219,7 +200,6 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "premium",
-    price: "$10-13",
     flavorNotes: ["earth", "cedar", "pepper", "leather"]
   },
   {
@@ -230,7 +210,6 @@ const fallbackCigars = [
     body: 2,
     strength: 1,
     priceTier: "premium",
-    price: "$10-14",
     flavorNotes: ["cream", "nuts", "toast", "mild spice"]
   },
   {
@@ -241,7 +220,6 @@ const fallbackCigars = [
     body: 5,
     strength: 5,
     priceTier: "premium",
-    price: "$11-15",
     flavorNotes: ["pepper", "earth", "leather", "spice"]
   },
   {
@@ -252,7 +230,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "premium",
-    price: "$12-16",
     flavorNotes: ["cedar", "nutmeg", "leather", "sweetness"]
   },
   {
@@ -263,7 +240,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "budget",
-    price: "$6-9",
     flavorNotes: ["chocolate", "coffee", "earth", "spice"]
   },
   {
@@ -274,7 +250,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "mid-range",
-    price: "$8-12",
     flavorNotes: ["cocoa", "pepper", "cedar", "nutmeg"]
   },
   {
@@ -285,7 +260,6 @@ const fallbackCigars = [
     body: 1,
     strength: 1,
     priceTier: "mid-range",
-    price: "$6-9",
     flavorNotes: ["cream", "nuts", "hay", "mild spice"]
   },
   {
@@ -296,7 +270,6 @@ const fallbackCigars = [
     body: 2,
     strength: 2,
     priceTier: "luxury",
-    price: "$16-22",
     flavorNotes: ["cream", "almond", "cedar", "honey"]
   },
   {
@@ -307,7 +280,6 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "mid-range",
-    price: "$8-12",
     flavorNotes: ["pepper", "earth", "cocoa", "sweet spice"]
   },
   {
@@ -318,7 +290,6 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "mid-range",
-    price: "$7-11",
     flavorNotes: ["spice", "earth", "cedar", "sweetness"]
   },
   {
@@ -329,7 +300,6 @@ const fallbackCigars = [
     body: 2,
     strength: 2,
     priceTier: "mid-range",
-    price: "$6-10",
     flavorNotes: ["cream", "toast", "nuts", "mild spice"]
   },
   {
@@ -340,7 +310,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "premium",
-    price: "$11-14",
     flavorNotes: ["oak", "coffee", "pepper", "dark chocolate"]
   },
   {
@@ -351,7 +320,6 @@ const fallbackCigars = [
     body: 4,
     strength: 5,
     priceTier: "premium",
-    price: "$13-16",
     flavorNotes: ["pepper", "cocoa", "oak", "spice"]
   },
   {
@@ -362,7 +330,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "mid-range",
-    price: "$7-11",
     flavorNotes: ["cedar", "earth", "spice", "nuts"]
   },
   {
@@ -373,7 +340,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "budget",
-    price: "$5-8",
     flavorNotes: ["cedar", "pepper", "nuts", "earth"]
   },
   {
@@ -384,7 +350,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "mid-range",
-    price: "$8-11",
     flavorNotes: ["cedar", "spice", "earth", "toast"]
   },
   {
@@ -395,7 +360,6 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "budget",
-    price: "$5-8",
     flavorNotes: ["coffee", "pepper", "earth", "dark chocolate"]
   },
   {
@@ -406,7 +370,6 @@ const fallbackCigars = [
     body: 5,
     strength: 5,
     priceTier: "mid-range",
-    price: "$8-12",
     flavorNotes: ["chocolate", "espresso", "pepper", "earth"]
   },
   {
@@ -417,7 +380,6 @@ const fallbackCigars = [
     body: 3,
     strength: 2,
     priceTier: "mid-range",
-    price: "$10-13",
     flavorNotes: ["cream", "cedar", "nutmeg", "sweetness"]
   },
   {
@@ -428,7 +390,6 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "mid-range",
-    price: "$9-12",
     flavorNotes: ["cedar", "spice", "earth", "nuts"]
   },
   {
@@ -439,7 +400,6 @@ const fallbackCigars = [
     body: 2,
     strength: 2,
     priceTier: "mid-range",
-    price: "$7-10",
     flavorNotes: ["cream", "cedar", "toast", "mild spice"]
   },
   {
@@ -450,7 +410,6 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "mid-range",
-    price: "$8-12",
     flavorNotes: ["spice", "cedar", "earth", "leather"]
   },
   {
@@ -461,7 +420,6 @@ const fallbackCigars = [
     body: 2,
     strength: 2,
     priceTier: "mid-range",
-    price: "$7-11",
     flavorNotes: ["cream", "nuts", "cedar", "honey"]
   },
   {
@@ -472,7 +430,6 @@ const fallbackCigars = [
     body: 1,
     strength: 1,
     priceTier: "budget",
-    price: "$5-8",
     flavorNotes: ["cream", "cedar", "toast", "nuts"]
   },
   {
@@ -483,7 +440,6 @@ const fallbackCigars = [
     body: 5,
     strength: 5,
     priceTier: "budget",
-    price: "$5-8",
     flavorNotes: ["espresso", "pepper", "earth", "chocolate"]
   },
   {
@@ -494,7 +450,6 @@ const fallbackCigars = [
     body: 4,
     strength: 4,
     priceTier: "mid-range",
-    price: "$8-11",
     flavorNotes: ["chocolate", "spice", "earth", "malt"]
   },
   {
@@ -505,10 +460,10 @@ const fallbackCigars = [
     body: 3,
     strength: 3,
     priceTier: "mid-range",
-    price: "$6-10",
     flavorNotes: ["cocoa", "coffee", "pepper", "earth"]
   }
-]
+];
+
 // OpenAI Configuration
 const OPENAI_CONFIG = {
   apiKey: process.env.OPENAI_API_KEY,
@@ -518,14 +473,12 @@ const OPENAI_CONFIG = {
   maxResponseSize: 50000
 };
 
-// Input sanitization function
 function sanitizeInput(input) {
   if (typeof input !== 'string') return '';
-  if (input.length > 100) return input.slice(0, 100); // Prevent excessively long inputs
+  if (input.length > 100) return input.slice(0, 100);
   return input.replace(/[<>]/g, '').replace(/\n|\r/g, ' ').trim();
 }
 
-// Safe string operations helper
 function safeStringOperation(value, operation = 'toLowerCase') {
   if (value === null || value === undefined) return '';
   try {
@@ -537,7 +490,6 @@ function safeStringOperation(value, operation = 'toLowerCase') {
   }
 }
 
-// Function to get recommendations from OpenAI
 async function getOpenAIRecommendations(cigarName) {
   if (!OPENAI_CONFIG.apiKey) {
     if (process.env.NODE_ENV !== 'production') {
@@ -557,7 +509,7 @@ async function getOpenAIRecommendations(cigarName) {
 
     const sanitizedInput = sanitizeInput(cigarName);
 
-    const prompt = `You are a cigar expert. A user is looking for recommendations based on: "${sanitizedInput}". Recommend exactly 3 cigars that are currently available for sale in the United States. Do NOT include Cuban cigars. Respond with ONLY a valid JSON array of exactly 3 cigar objects, each including: name, brand, wrapper, origin, body (1-5), strength (1-5), priceTier, price, and flavorNotes (array of strings). Do not include any explanation or additional text - just the JSON array.`;
+    const prompt = `You are a cigar expert. A user is looking for recommendations based on: "${sanitizedInput}". Recommend exactly 3 cigars that are currently available for sale in the United States. Do NOT include Cuban cigars. Respond with ONLY a valid JSON array of exactly 3 cigar objects, each including: name, brand, wrapper, origin, body (1-5), strength (1-5), priceTier, and flavorNotes (array of strings). Do not include any explanation or additional text - just the JSON array.`;
 
     const response = await fetch(OPENAI_CONFIG.endpoint, {
       method: 'POST',
@@ -642,7 +594,6 @@ async function getOpenAIRecommendations(cigarName) {
   }
 }
 
-// Detect Cuban cigars
 function isCuban(cigar) {
   if (!cigar || typeof cigar !== 'object') return false;
   const check = (field) => {
@@ -656,7 +607,6 @@ function isCuban(cigar) {
   );
 }
 
-// Fisher-Yates shuffle
 function shuffle(array) {
   if (!Array.isArray(array)) return [];
   const shuffled = [...array];
@@ -667,14 +617,12 @@ function shuffle(array) {
   return shuffled;
 }
 
-// Similarity scoring
 function calculateSimilarity(c1, c2) {
   if (!c1 || !c2 || typeof c1 !== 'object' || typeof c2 !== 'object') {
     return 0;
   }
   let score = 0;
 
-  // Wrapper similarity
   if (c1.wrapper && c2.wrapper) {
     const w1 = safeStringOperation(c1.wrapper);
     const w2 = safeStringOperation(c2.wrapper);
@@ -695,7 +643,6 @@ function calculateSimilarity(c1, c2) {
     }
   }
 
-  // Origin similarity
   if (c1.origin && c2.origin) {
     const o1 = safeStringOperation(c1.origin);
     const o2 = safeStringOperation(c2.origin);
@@ -708,7 +655,6 @@ function calculateSimilarity(c1, c2) {
     }
   }
 
-  // Price tier similarity
   if (c1.priceTier && c2.priceTier) {
     if (c1.priceTier === c2.priceTier) score += 2;
     else if (
@@ -719,7 +665,6 @@ function calculateSimilarity(c1, c2) {
     }
   }
 
-  // Body similarity
   if (typeof c1.body === 'number' && typeof c2.body === 'number') {
     const diff = Math.abs(c1.body - c2.body);
     if (diff === 0) score += 6;
@@ -728,7 +673,6 @@ function calculateSimilarity(c1, c2) {
     else score -= 2;
   }
 
-  // Strength similarity
   if (typeof c1.strength === 'number' && typeof c2.strength === 'number') {
     const diff = Math.abs(c1.strength - c2.strength);
     if (diff === 0) score += 10;
@@ -738,7 +682,6 @@ function calculateSimilarity(c1, c2) {
     else if (diff >= 4) score -= 8;
   }
 
-  // Flavor notes similarity
   if (Array.isArray(c1.flavorNotes) && Array.isArray(c2.flavorNotes)) {
     const notes1 = c1.flavorNotes.map(n => safeStringOperation(n));
     const notes2 = c2.flavorNotes.map(n => safeStringOperation(n));
@@ -760,7 +703,6 @@ function calculateSimilarity(c1, c2) {
   return score;
 }
 
-// Fallback recommendations if OpenAI fails
 function getFallbackRecommendations(cigarName) {
   const usCigars = fallbackCigars.filter(c => !isCuban(c));
   const input = safeStringOperation(cigarName.trim());
@@ -803,7 +745,6 @@ function getFallbackRecommendations(cigarName) {
   return recs.slice(0, 3);
 }
 
-// Main handler
 exports.handler = async function(event, context) {
   const CORS = {
     "Access-Control-Allow-Origin": "*",
@@ -890,5 +831,3 @@ exports.handler = async function(event, context) {
     }
   }
 };
-
-
