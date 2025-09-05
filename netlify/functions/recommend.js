@@ -2,7 +2,6 @@
   
 // Enhanced cigar database with price field added  
 const fallbackCigars = [
- [
   {
     name: "Padron 1964 Anniversary",
     brand: "Padron",
