@@ -87,8 +87,8 @@ const fallbackCigars = [
 const OPENAI_CONFIG = {
   apiKey: process.env.OPENAI_API_KEY,
   endpoint: "https://api.openai.com/v1/chat/completions",
-  model: "gpt-4o-mini", // Cost-effective model, great for structured data
-  timeout: 8000 // 8 second timeout
+  model: "gpt-4o-mini",
+  timeout: 8000
 };
 
 // Function to get recommendations from OpenAI
@@ -102,7 +102,6 @@ async function getOpenAIRecommendations(cigarName) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), OPENAI_CONFIG.timeout);
 
-    // Create a prompt that asks OpenAI to select from our database
     const prompt = `You are a cigar expert. A user is looking for recommendations based on: "${cigarName}"
 
 Here is my cigar database to choose from:
@@ -113,6 +112,7 @@ Please analyze the user's input and recommend exactly 3 cigars from this databas
 - If they mention flavors, find cigars with those or complementary notes
 - If they mention strength preference, match accordingly
 - Provide variety in your selections when possible
+- DO NOT recommend the exact cigar they searched for
 
 Respond with ONLY a valid JSON array of exactly 3 cigar objects from the database above. Do not include any explanation or additional text - just the JSON array.
 
@@ -160,13 +160,12 @@ Example format:
       throw new Error('Empty response from OpenAI');
     }
 
-    // Parse the JSON response
     try {
       const recommendations = JSON.parse(content);
       
       if (Array.isArray(recommendations) && recommendations.length > 0) {
         console.log(`OpenAI returned ${recommendations.length} recommendations`);
-        return recommendations.slice(0, 3); // Ensure exactly 3
+        return recommendations.slice(0, 3);
       } else {
         throw new Error('Invalid recommendations format');
       }
@@ -182,7 +181,7 @@ Example format:
   }
 }
 
-// Detect Cuban cigars (for fallback filtering)
+// Detect Cuban cigars
 function isCuban(cigar) {
   const check = (field) => {
     if (!field) return false;
@@ -196,9 +195,9 @@ function isCuban(cigar) {
   );
 }
 
-// FIXED shuffle function - now properly returns the array
+// Fixed shuffle function
 function shuffle(array) {
-  const shuffled = [...array]; // Create copy to avoid mutating original
+  const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -206,7 +205,7 @@ function shuffle(array) {
   return shuffled;
 }
 
-// Basic similarity calculation (deterministic for OpenAI consistency)
+// Similarity calculation
 function calculateSimilarity(cigar1, cigar2) {
   let score = 0;
   
@@ -227,45 +226,87 @@ function calculateSimilarity(cigar1, cigar2) {
   return score;
 }
 
-// UPDATED: Find similar cigars with randomness applied at the selection level
-function findSimilarCigars(referenceCigar, availableCigars, count = 2) {
+// Find similar cigars with variety and exclusion
+function findSimilarCigars(referenceCigar, availableCigars, excludedNames = [], count = 3) {
   const similarities = availableCigars
-    .filter(c => c.name !== referenceCigar.name)
+    .filter(c => 
+      c.name !== referenceCigar.name && 
+      !excludedNames.includes(c.name.toLowerCase())
+    )
     .map(cigar => ({
       cigar,
       similarity: calculateSimilarity(referenceCigar, cigar)
     }))
     .sort((a, b) => b.similarity - a.similarity);
   
-  // Get top candidates (more than needed for randomness)
-  const topCandidates = similarities.slice(0, Math.min(count * 3, similarities.length));
+  // Get larger pool for variety
+  const poolSize = Math.min(count * 4, similarities.length);
+  const topCandidates = similarities.slice(0, poolSize);
   
-  // Shuffle the top candidates and pick the requested count
-  const shuffledCandidates = shuffle(topCandidates);
+  // Group by similarity score
+  const similarityGroups = {};
+  topCandidates.forEach(item => {
+    const score = Math.floor(item.similarity);
+    if (!similarityGroups[score]) similarityGroups[score] = [];
+    similarityGroups[score].push(item);
+  });
   
-  return shuffledCandidates.slice(0, count).map(item => item.cigar);
+  // Select from different tiers for variety
+  const selected = [];
+  const scores = Object.keys(similarityGroups).sort((a, b) => b - a);
+  
+  for (let i = 0; i < count && selected.length < count; i++) {
+    const scoreIndex = i % scores.length;
+    const score = scores[scoreIndex];
+    const group = similarityGroups[score];
+    
+    if (group && group.length > 0) {
+      const shuffledGroup = shuffle(group);
+      const available = shuffledGroup.filter(item => 
+        !selected.some(sel => sel.cigar.name === item.cigar.name)
+      );
+      
+      if (available.length > 0) {
+        selected.push(available[0]);
+      }
+    }
+  }
+  
+  // Fill remaining slots if needed
+  if (selected.length < count) {
+    const remaining = shuffle(topCandidates.filter(item => 
+      !selected.some(sel => sel.cigar.name === item.cigar.name)
+    ));
+    
+    selected.push(...remaining.slice(0, count - selected.length));
+  }
+  
+  return selected.map(item => item.cigar);
 }
 
-// UPDATED: Fallback recommendation logic with proper randomness
+// FIXED: Fallback recommendation logic that excludes searched cigars
 function getFallbackRecommendations(cigarName) {
   const usCigars = fallbackCigars.filter(c => !isCuban(c));
   const input = cigarName.trim().toLowerCase();
-  let recs = [];
-
+  
+  // Find exact matches to use as reference but EXCLUDE from recommendations
   const exactMatches = usCigars.filter(c =>
     (c.name && c.name.toLowerCase().includes(input)) ||
     (c.brand && c.brand.toLowerCase().includes(input))
   );
+  
+  // Get names of exact matches to exclude from recommendations
+  const excludedNames = exactMatches.map(c => c.name.toLowerCase());
+  
+  let recs = [];
 
   if (exactMatches.length > 0) {
-    // Shuffle exact matches first for variety
+    // Use an exact match as reference but don't include it in results
     const shuffledMatches = shuffle(exactMatches);
     const baseMatch = shuffledMatches[0];
-    recs.push(baseMatch);
     
-    // Find similar cigars with randomness
-    const similar = findSimilarCigars(baseMatch, usCigars, 2);
-    recs = recs.concat(similar);
+    // Find similar cigars, excluding all exact matches
+    recs = findSimilarCigars(baseMatch, usCigars, excludedNames, 3);
   } else {
     // Handle flavor matches
     const flavorMatches = usCigars.filter(c =>
@@ -274,17 +315,70 @@ function getFallbackRecommendations(cigarName) {
     );
     
     if (flavorMatches.length > 0) {
-      recs = shuffle(flavorMatches).slice(0, 3);
+      // Separate strong vs regular flavor matches
+      const strongMatches = flavorMatches.filter(c => 
+        c.flavorNotes.filter(note => input.includes(note.toLowerCase())).length > 1
+      );
+      const regularMatches = flavorMatches.filter(c => 
+        c.flavorNotes.filter(note => input.includes(note.toLowerCase())).length === 1
+      );
+      
+      // Mix from different tiers
+      const selectedRecs = [];
+      if (strongMatches.length > 0) {
+        selectedRecs.push(...shuffle(strongMatches).slice(0, 1));
+      }
+      if (regularMatches.length > 0) {
+        const needed = 3 - selectedRecs.length;
+        selectedRecs.push(...shuffle(regularMatches).slice(0, needed));
+      }
+      
+      recs = selectedRecs.slice(0, 3);
     } else {
-      recs = shuffle(usCigars).slice(0, 3);
+      // Random selection with strength variety
+      const mildCigars = usCigars.filter(c => c.strength <= 5);
+      const mediumCigars = usCigars.filter(c => c.strength > 5 && c.strength <= 7);
+      const strongCigars = usCigars.filter(c => c.strength > 7);
+      
+      const pools = [mildCigars, mediumCigars, strongCigars].filter(pool => pool.length > 0);
+      const selectedRecs = [];
+      
+      for (let i = 0; i < 3 && pools.length > 0; i++) {
+        const poolIndex = i % pools.length;
+        const pool = pools[poolIndex];
+        const shuffledPool = shuffle(pool);
+        const available = shuffledPool.filter(c => 
+          !selectedRecs.some(rec => rec.name === c.name)
+        );
+        
+        if (available.length > 0) {
+          selectedRecs.push(available[0]);
+        }
+      }
+      
+      recs = selectedRecs;
     }
   }
 
-  // Fill remaining slots if needed
+  // Fill remaining slots with variety
   if (recs.length < 3) {
     const needed = 3 - recs.length;
-    const remaining = shuffle(usCigars.filter(c => !recs.some(r => r.name === c.name)));
-    recs = recs.concat(remaining.slice(0, needed));
+    const remaining = usCigars.filter(c => 
+      !recs.some(r => r.name === c.name) &&
+      !excludedNames.includes(c.name.toLowerCase())
+    );
+    
+    // Add variety in strength
+    const usedStrengths = recs.map(r => Math.floor(r.strength / 2) * 2);
+    const differentStrength = remaining.filter(c => 
+      !usedStrengths.includes(Math.floor(c.strength / 2) * 2)
+    );
+    
+    if (differentStrength.length > 0) {
+      recs.push(...shuffle(differentStrength).slice(0, needed));
+    } else {
+      recs.push(...shuffle(remaining).slice(0, needed));
+    }
   }
 
   return recs.slice(0, 3);
@@ -346,7 +440,6 @@ exports.handler = async function(event, context) {
       body: JSON.stringify(recommendations)
     };
   } catch (err) {
-    // Final fallback - if everything fails
     console.error('All systems failed, using emergency fallback:', err.message);
     try {
       const fallbackRecs = getFallbackRecommendations(cigarName || "");
@@ -361,9 +454,3 @@ exports.handler = async function(event, context) {
         headers: CORS,
         body: JSON.stringify({
           error: "All systems failed",
-          details: err.message
-        })
-      };
-    }
-  }
-};
