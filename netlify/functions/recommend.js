@@ -9,7 +9,7 @@ const fallbackCigars = [
     wrapper: "Habano Maduro",
     origin: "Nicaragua",
     body: 4,
-    strength: 4,
+    strength: 4, // Medium-full strength
     priceTier: "premium",
     flavorNotes: ["chocolate", "coffee", "leather", "spice"]
   },
@@ -19,7 +19,7 @@ const fallbackCigars = [
     wrapper: "Connecticut",
     origin: "Dominican Republic",
     body: 2,
-    strength: 2,
+    strength: 1, // Very mild strength
     priceTier: "mid-range",
     flavorNotes: ["cedar", "cream", "nuts", "mild spice"]
   },
@@ -29,7 +29,7 @@ const fallbackCigars = [
     wrapper: "Connecticut Shade",
     origin: "Dominican Republic",
     body: 2,
-    strength: 2,
+    strength: 1, // Very mild, creamy
     priceTier: "mid-range",
     flavorNotes: ["cream", "cedar", "vanilla", "nuts"]
   },
@@ -39,7 +39,7 @@ const fallbackCigars = [
     wrapper: "Brazilian Maduro",
     origin: "Nicaragua",
     body: 4,
-    strength: 4,
+    strength: 4, // Medium-full strength
     priceTier: "mid-range",
     flavorNotes: ["chocolate", "coffee", "earth", "sweetness"]
   },
@@ -49,7 +49,7 @@ const fallbackCigars = [
     wrapper: "Cameroon",
     origin: "Dominican Republic",
     body: 3,
-    strength: 3,
+    strength: 2, // Medium body, mild-medium strength
     priceTier: "premium",
     flavorNotes: ["cedar", "spice", "leather", "earth"]
   },
@@ -59,7 +59,7 @@ const fallbackCigars = [
     wrapper: "Connecticut Shade",
     origin: "Dominican Republic",
     body: 2,
-    strength: 2,
+    strength: 1, // Very mild and smooth
     priceTier: "premium",
     flavorNotes: ["cream", "nuts", "cedar", "mild spice"]
   },
@@ -69,7 +69,7 @@ const fallbackCigars = [
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
     body: 3,
-    strength: 3,
+    strength: 2, // Medium body, mild-medium strength
     priceTier: "mid-range",
     flavorNotes: ["coffee", "chocolate", "pepper", "cedar"]
   },
@@ -79,7 +79,7 @@ const fallbackCigars = [
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
     body: 4,
-    strength: 4,
+    strength: 5, // Full strength
     priceTier: "premium",
     flavorNotes: ["coffee", "chocolate", "pepper", "leather"]
   },
@@ -89,7 +89,7 @@ const fallbackCigars = [
     wrapper: "Connecticut Shade",
     origin: "Nicaragua",
     body: 2,
-    strength: 2,
+    strength: 1, // Very mild and creamy
     priceTier: "budget",
     flavorNotes: ["cream", "vanilla", "nuts", "mild spice"]
   },
@@ -99,7 +99,7 @@ const fallbackCigars = [
     wrapper: "Ecuador Habano Oscuro",
     origin: "Nicaragua",
     body: 4,
-    strength: 4,
+    strength: 5, // Full strength pepper bomb
     priceTier: "premium",
     flavorNotes: ["pepper", "chocolate", "coffee", "earth"]
   }
