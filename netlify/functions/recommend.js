@@ -555,25 +555,14 @@ async function getOpenAIRecommendations(cigarName) {
   try {
     controller = new AbortController();
     timeoutId = setTimeout(() => {
-      if (controller) controller.abort(); // FIXED: Check controller exists
+      if (controller) controller.abort();
     }, OPENAI_CONFIG.timeout);
 
-    // FIXED: Sanitize input to prevent prompt injection
+    // Sanitize input to prevent prompt injection
     const sanitizedInput = sanitizeInput(cigarName);
     
-    const prompt = `You are a cigar expert. A user is looking for recommendations based on: "${sanitizedInput}"
-
-Here is my cigar database to choose from:
-${JSON.stringify(fallbackCigars, null, 2)}
-
-Please analyze the user's input and recommend exactly 3 cigars from this database that would be good matches. Consider:
-- If they mention a specific brand/cigar, find similar ones (similar strength, flavor notes)  
-- If they mention flavors, find cigars with those or complementary notes
-- If they mention strength preference, match accordingly
-- Provide variety in your selections when possible
-- DO NOT recommend the exact cigar they searched for
-
-Respond with ONLY a valid JSON array of exactly 3 cigar objects from the database above. Do not include any explanation or additional text - just the JSON array.`;
+    // === NEW PROMPT BELOW ===
+    const prompt = `You are a cigar expert. A user is looking for recommendations based on: "${sanitizedInput}". Recommend exactly 3 cigars that are currently available for sale in the United States. Do NOT include Cuban cigars. Respond with ONLY a valid JSON array of exactly 3 cigar objects, each including: name, brand, wrapper, origin, body (1-5), strength (1-5), priceTier, price, and flavorNotes (array of strings). Do not include any explanation or additional text - just the JSON array.`;
 
     const response = await fetch(OPENAI_CONFIG.endpoint, {
       method: 'POST',
@@ -594,12 +583,11 @@ Respond with ONLY a valid JSON array of exactly 3 cigar objects from the databas
           }
         ],
         max_tokens: 1500,
-        temperature: 0.7
+        temperature: 0.9
       }),
       signal: controller.signal
     });
 
-    // FIXED: Proper timeout cleanup
     if (timeoutId) {
       clearTimeout(timeoutId);
       timeoutId = null;
@@ -608,6 +596,62 @@ Respond with ONLY a valid JSON array of exactly 3 cigar objects from the databas
     if (!response.ok) {
       throw new Error(`OpenAI API returned ${response.status}: ${response.statusText}`);
     }
+
+    const contentLength = response.headers.get('content-length');
+    if (contentLength && parseInt(contentLength) > OPENAI_CONFIG.maxResponseSize) {
+      throw new Error('Response too large');
+    }
+
+    const data = await response.json();
+    
+    if (!data || !data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
+      throw new Error('Invalid response structure from OpenAI');
+    }
+
+    const content = data.choices[0]?.message?.content?.trim();
+    
+    if (!content) {
+      throw new Error('Empty response from OpenAI');
+    }
+
+    if (content.length > OPENAI_CONFIG.maxResponseSize) {
+      throw new Error('Response content too large');
+    }
+
+    try {
+      let cleanContent = content;
+      if (content.startsWith('```json')) {
+        cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+      }
+      
+      const recommendations = JSON.parse(cleanContent);
+      
+      if (Array.isArray(recommendations) && recommendations.length > 0) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`OpenAI returned ${recommendations.length} recommendations`);
+        }
+        return recommendations.slice(0, 3);
+      } else {
+        throw new Error('Invalid recommendations format');
+      }
+    } catch (parseError) {
+      console.warn('Failed to parse OpenAI response:', parseError.message);
+      return null;
+    }
+
+  } catch (error) {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    if (error.name === 'AbortError') {
+      console.warn('OpenAI API call timed out');
+    } else {
+      console.warn('OpenAI API call failed:', error.message);
+    }
+    return null;
+  }
+}
+
 
     const contentLength = response.headers.get('content-length');
     if (contentLength && parseInt(contentLength) > OPENAI_CONFIG.maxResponseSize) {
