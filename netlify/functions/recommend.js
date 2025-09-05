@@ -225,9 +225,6 @@ ffunction calculateSimilarity(cigar1, cigar2) {
     score += commonNotes.length;
   }
   
-  // Add randomness factor
-  score += Math.random() * 0.5;
-  
   return score;
 }
 
