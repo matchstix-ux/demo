@@ -1,7 +1,7 @@
 // netlify/functions/recommend.js
 
 // Enhanced cigar database with accurate wrapper, origin, body, and price tier data
-const fallbackCigars = [ 
+const fallbackCigars = [
   {
     name: "Padron 1964 Anniversary Exclusivo",
     brand: "Padron",
@@ -321,12 +321,13 @@ function calculateSimilarity(c1, c2) {
     }
   }
 
-  // Body similarity
+  // Body similarity (also important)
   if (typeof c1.body === 'number' && typeof c2.body === 'number') {
     const diff = Math.abs(c1.body - c2.body);
-    if (diff === 0) score += 3;
-    else if (diff === 1) score += 2;
-    else if (diff === 2) score += 1;
+    if (diff === 0) score += 6; // Exact body match
+    else if (diff === 1) score += 3; // Close body
+    else if (diff === 2) score += 1; // Moderate difference
+    else score -= 2; // Big body difference - small penalty
   }
 
   // Strength similarity
@@ -380,6 +381,7 @@ function getFallbackRecommendations(cigarName) {
     const candidates = usCigars
       .filter(c => c.name !== base.name && !excluded.includes(safeStringOperation(c.name || '')))
       .map(c => ({ cigar: c, similarity: calculateSimilarity(base, c) }))
+      .filter(c => c.similarity > 0) // Filter out negative matches!
       .sort((a, b) => b.similarity - a.similarity);
     recs = shuffle(candidates.slice(0, 12)).slice(0, 3).map(x => x.cigar);
   } else {
