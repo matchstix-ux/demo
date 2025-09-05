@@ -205,7 +205,7 @@ function shuffle(array) {
     array[m] = array[i];
     array[i] = t;
   }
-  return array;
+  return array; 
 }
 
 function calculateSimilarity(cigar1, cigar2) {
