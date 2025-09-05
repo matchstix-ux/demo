@@ -1,6 +1,6 @@
 // app.js — Vanilla JS for MatchSticks
 
-const API_PATH = '/.netlify/functions/recommend';
+const API_PATH = '/.netlify/functions/recommend';  
 
 const form = document.getElementById('searchForm');
 const queryInput = document.getElementById('query');
