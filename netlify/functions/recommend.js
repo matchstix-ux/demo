@@ -2,14 +2,13 @@
 
 // Enhanced cigar database with accurate wrapper, origin, body, and price tier data
 const fallbackCigars = [
-  // Sample cigars - replace with your actual database
   {
     name: "Padron 1964 Anniversary Exclusivo",
     brand: "Padron",
     wrapper: "Habano Maduro",
     origin: "Nicaragua",
     body: 4,
-    strength: 4, // Medium-full strength
+    strength: 4,
     priceTier: "premium",
     flavorNotes: ["chocolate", "coffee", "leather", "spice"]
   },
@@ -19,7 +18,7 @@ const fallbackCigars = [
     wrapper: "Connecticut",
     origin: "Dominican Republic",
     body: 2,
-    strength: 1, // Very mild strength
+    strength: 2, // Updated from 1 → 2
     priceTier: "mid-range",
     flavorNotes: ["cedar", "cream", "nuts", "mild spice"]
   },
@@ -29,7 +28,7 @@ const fallbackCigars = [
     wrapper: "Connecticut Shade",
     origin: "Dominican Republic",
     body: 2,
-    strength: 1, // Very mild, creamy
+    strength: 1,
     priceTier: "mid-range",
     flavorNotes: ["cream", "cedar", "vanilla", "nuts"]
   },
@@ -39,7 +38,7 @@ const fallbackCigars = [
     wrapper: "Brazilian Maduro",
     origin: "Nicaragua",
     body: 4,
-    strength: 4, // Medium-full strength
+    strength: 4,
     priceTier: "mid-range",
     flavorNotes: ["chocolate", "coffee", "earth", "sweetness"]
   },
@@ -49,7 +48,7 @@ const fallbackCigars = [
     wrapper: "Cameroon",
     origin: "Dominican Republic",
     body: 3,
-    strength: 2, // Medium body, mild-medium strength
+    strength: 3, // Updated from 2 → 3
     priceTier: "premium",
     flavorNotes: ["cedar", "spice", "leather", "earth"]
   },
@@ -59,7 +58,7 @@ const fallbackCigars = [
     wrapper: "Connecticut Shade",
     origin: "Dominican Republic",
     body: 2,
-    strength: 1, // Very mild and smooth
+    strength: 1,
     priceTier: "premium",
     flavorNotes: ["cream", "nuts", "cedar", "mild spice"]
   },
@@ -69,7 +68,7 @@ const fallbackCigars = [
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
     body: 3,
-    strength: 2, // Medium body, mild-medium strength
+    strength: 4, // Updated from 2 → 4
     priceTier: "mid-range",
     flavorNotes: ["coffee", "chocolate", "pepper", "cedar"]
   },
@@ -79,7 +78,7 @@ const fallbackCigars = [
     wrapper: "Ecuador Habano",
     origin: "Nicaragua",
     body: 4,
-    strength: 5, // Full strength
+    strength: 4, // Updated from 5 → 4
     priceTier: "premium",
     flavorNotes: ["coffee", "chocolate", "pepper", "leather"]
   },
@@ -89,7 +88,7 @@ const fallbackCigars = [
     wrapper: "Connecticut Shade",
     origin: "Nicaragua",
     body: 2,
-    strength: 1, // Very mild and creamy
+    strength: 1,
     priceTier: "budget",
     flavorNotes: ["cream", "vanilla", "nuts", "mild spice"]
   },
@@ -99,32 +98,12 @@ const fallbackCigars = [
     wrapper: "Ecuador Habano Oscuro",
     origin: "Nicaragua",
     body: 4,
-    strength: 5, // Full strength pepper bomb
+    strength: 5,
     priceTier: "premium",
     flavorNotes: ["pepper", "chocolate", "coffee", "earth"]
   }
 ];
 
-// OpenAI Configuration
-const OPENAI_CONFIG = {
-  apiKey: process.env.OPENAI_API_KEY,
-  endpoint: "https://api.openai.com/v1/chat/completions",
-  model: "gpt-4o-mini",
-  timeout: 8000,
-  maxResponseSize: 50000 // 50KB limit for safety
-};
-
-// Safe string operations helper
-function safeStringOperation(value, operation = 'toLowerCase') {
-  if (value === null || value === undefined) return '';
-  try {
-    const str = typeof value === 'string' ? value : String(value);
-    return operation === 'toLowerCase' ? str.toLowerCase() : str;
-  } catch (error) {
-    console.warn('Safe string operation failed:', error.message);
-    return '';
-  }
-}
 
 // Function to get recommendations from OpenAI
 async function getOpenAIRecommendations(cigarName) {
