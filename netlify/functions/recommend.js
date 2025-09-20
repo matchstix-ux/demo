@@ -1,57 +1,68 @@
 // netlify/functions/recommend.js
 
-const fallbackCigars = [
-  {
-    name: "Padron 1964 Anniversary Exclusivo",
-    brand: "Padron",
-    wrapper: "Habano Maduro",
-    origin: "Nicaragua",
-    strength: 4,
-    priceTier: "luxury",
-    flavorNotes: ["chocolate", "coffee", "leather", "spice"]
-  },
-  {
-    name: "Montecristo White Robusto",
-    brand: "Montecristo",
-    wrapper: "Connecticut Shade",
-    origin: "Dominican Republic",
-    strength: 2,
-    priceTier: "mid-range",
-    flavorNotes: ["cedar", "cream", "almond"]
-  },
-  {
-    name: "Oliva Serie V Melanio",
-    brand: "Oliva",
-    wrapper: "Sumatra",
-    origin: "Nicaragua",
-    strength: 3,
-    priceTier: "premium",
-    flavorNotes: ["chocolate", "pepper", "earth"]
-  }
-];
+import { Configuration, OpenAIApi } from "openai";
+import fallbackCigars from "./fallbackCigars.js"; // Your local list
 
-// ⛑ Dummy OpenAI function — replace later
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+
+function getFallbackRecommendations(query) {
+  const lowerQuery = query.toLowerCase();
+  return fallbackCigars
+    .filter(cigar =>
+      cigar.name.toLowerCase().includes(lowerQuery) ||
+      cigar.brand.toLowerCase().includes(lowerQuery) ||
+      (cigar.flavorNotes || []).some(note =>
+        note.toLowerCase().includes(lowerQuery)
+      )
+    )
+    .slice(0, 3);
+}
+
 async function getOpenAIRecommendations(cigarName) {
-  // If you don't have real OpenAI calls yet, just simulate:
-  return [
-    {
-      name: `AI Pick for ${cigarName}`,
-      brand: "Simulated Brand",
-      wrapper: "Ecuador Sumatra",
-      origin: "Honduras",
-      strength: 3,
-      priceTier: "mid-range",
-      flavorNotes: ["coffee", "leather", "cedar"]
-    }
-  ];
+  const prompt = `
+You are an AI cigar sommelier. Return exactly 3 recommended premium cigars based on the user's input: "${cigarName}". 
+Response must be a JSON array with this structure:
+
+[
+  {
+    "name": "Cigar Name",
+    "brand": "Brand Name",
+    "strength": 1-5,
+    "priceTier": "$" | "$$" | "$$$" | "$$$$",
+    "flavorNotes": ["note1", "note2", "note3"]
+  }
+]
+
+Rules:
+- NO Cuban cigars or brands
+- Strength: 1 = mild, 5 = full-bodied
+- Flavor notes should be real cigar tasting notes (coffee, cedar, earth, etc)
+- Keep names and brands realistic, preferably ones sold in the US
+`;
+
+  const completion = await openai.createChatCompletion({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.7,
+    max_tokens: 500,
+  });
+
+  const rawText = completion.data.choices?.[0]?.message?.content?.trim() || "[]";
+
+  try {
+    const result = JSON.parse(rawText);
+    if (Array.isArray(result)) return result;
+    throw new Error("Result was not an array");
+  } catch (err) {
+    console.error("OpenAI result parse failed:", err.message);
+    return [];
+  }
 }
 
-// ✅ Safe fallback logic
-function getFallbackRecommendations(cigarName) {
-  return fallbackCigars;
-}
-
-exports.handler = async function(event, context) {
+export const handler = async function(event, context) {
   const CORS = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST,OPTIONS",
@@ -70,37 +81,20 @@ exports.handler = async function(event, context) {
   let cigarName = "";
 
   try {
-    let requestBody = {};
-    try {
-      const bodySize = event.body ? event.body.length : 0;
-      if (bodySize > 10000) {
-        return {
-          statusCode: 413,
-          headers: CORS,
-          body: JSON.stringify({ error: "Request body too large" })
-        };
-      }
-
-      requestBody = JSON.parse(event.body || "{}");
-      cigarName = requestBody.query || requestBody.cigarName || "";
-
-    } catch (parseError) {
-      return { 
-        statusCode: 400, 
-        headers: CORS, 
-        body: JSON.stringify({ 
-          error: "Bad request", 
-          details: "Could not parse request body as JSON" 
-        }) 
+    const bodySize = event.body ? event.body.length : 0;
+    if (bodySize > 10000) {
+      return {
+        statusCode: 413,
+        headers: CORS,
+        body: JSON.stringify({ error: "Request body too large" })
       };
     }
 
+    const requestBody = JSON.parse(event.body || "{}");
+    cigarName = requestBody.query || requestBody.cigarName || "";
+
     if (!cigarName.trim()) {
-      return { 
-        statusCode: 400, 
-        headers: CORS, 
-        body: JSON.stringify({ error: "Missing cigar name" }) 
-      };
+      return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: "Missing cigar name" }) };
     }
 
     let recommendations = await getOpenAIRecommendations(cigarName);
@@ -121,6 +115,7 @@ exports.handler = async function(event, context) {
       const fallback = getFallbackRecommendations(cigarName || "");
       return { statusCode: 200, headers: CORS, body: JSON.stringify(fallback) };
     } catch (fallbackErr) {
+      console.error("Fallback also failed:", fallbackErr.message);
       return {
         statusCode: 500,
         headers: CORS,
