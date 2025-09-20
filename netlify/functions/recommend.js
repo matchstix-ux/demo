@@ -1,6 +1,55 @@
 // netlify/functions/recommend.js
 
-// (Everything else above this line is unchanged…)
+const fallbackCigars = [
+  {
+    name: "Padron 1964 Anniversary Exclusivo",
+    brand: "Padron",
+    wrapper: "Habano Maduro",
+    origin: "Nicaragua",
+    strength: 4,
+    priceTier: "luxury",
+    flavorNotes: ["chocolate", "coffee", "leather", "spice"]
+  },
+  {
+    name: "Montecristo White Robusto",
+    brand: "Montecristo",
+    wrapper: "Connecticut Shade",
+    origin: "Dominican Republic",
+    strength: 2,
+    priceTier: "mid-range",
+    flavorNotes: ["cedar", "cream", "almond"]
+  },
+  {
+    name: "Oliva Serie V Melanio",
+    brand: "Oliva",
+    wrapper: "Sumatra",
+    origin: "Nicaragua",
+    strength: 3,
+    priceTier: "premium",
+    flavorNotes: ["chocolate", "pepper", "earth"]
+  }
+];
+
+// ⛑ Dummy OpenAI function — replace later
+async function getOpenAIRecommendations(cigarName) {
+  // If you don't have real OpenAI calls yet, just simulate:
+  return [
+    {
+      name: `AI Pick for ${cigarName}`,
+      brand: "Simulated Brand",
+      wrapper: "Ecuador Sumatra",
+      origin: "Honduras",
+      strength: 3,
+      priceTier: "mid-range",
+      flavorNotes: ["coffee", "leather", "cedar"]
+    }
+  ];
+}
+
+// ✅ Safe fallback logic
+function getFallbackRecommendations(cigarName) {
+  return fallbackCigars;
+}
 
 exports.handler = async function(event, context) {
   const CORS = {
@@ -33,8 +82,6 @@ exports.handler = async function(event, context) {
       }
 
       requestBody = JSON.parse(event.body || "{}");
-
-      // ✅ FIXED LINE: accepts both 'query' and 'cigarName'
       cigarName = requestBody.query || requestBody.cigarName || "";
 
     } catch (parseError) {
@@ -56,16 +103,9 @@ exports.handler = async function(event, context) {
       };
     }
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.log("Trying OpenAI recommendation for:", cigarName);
-    }
-
     let recommendations = await getOpenAIRecommendations(cigarName);
 
     if (!recommendations || recommendations.length === 0) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log("Using fallback logic");
-      }
       recommendations = getFallbackRecommendations(cigarName);
     }
 
@@ -81,7 +121,6 @@ exports.handler = async function(event, context) {
       const fallback = getFallbackRecommendations(cigarName || "");
       return { statusCode: 200, headers: CORS, body: JSON.stringify(fallback) };
     } catch (fallbackErr) {
-      console.error("Fallback also failed:", fallbackErr.message);
       return {
         statusCode: 500,
         headers: CORS,
