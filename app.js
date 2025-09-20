@@ -1,4 +1,4 @@
-// app.js — Vanilla JS for MatchSticks
+// app.js — MatchSticks with thumbs-down replacement via OpenAI
 
 const API_PATH = '/.netlify/functions/recommend';
 
@@ -7,9 +7,9 @@ const queryInput = document.getElementById('query');
 const status = document.getElementById('status');
 const results = document.getElementById('results');
 
-let lastQuery = ''; // stores the last search input
+let lastQuery = ''; // Store the last search input
 
-// Store feedback in localStorage
+// Store user feedback in localStorage
 function saveFeedback(cigarName, liked) {
   const feedback = JSON.parse(localStorage.getItem('cigarFeedback') || '{}');
   if (!feedback[cigarName]) feedback[cigarName] = { likes: 0, dislikes: 0 };
@@ -17,6 +17,7 @@ function saveFeedback(cigarName, liked) {
   localStorage.setItem('cigarFeedback', JSON.stringify(feedback));
 }
 
+// Render one cigar card
 function renderCigar(cigar) {
   return `
     <div class="card" data-name="${cigar.name}">
@@ -32,7 +33,7 @@ function renderCigar(cigar) {
   `;
 }
 
-// Helper to display tier with nice formatting
+// Format the price tier
 function formatTier(tier) {
   if (!tier) return "";
   switch (tier) {
@@ -44,6 +45,7 @@ function formatTier(tier) {
   }
 }
 
+// Handle form submission
 form.onsubmit = async (e) => {
   e.preventDefault();
   const q = queryInput.value.trim();
@@ -61,7 +63,7 @@ form.onsubmit = async (e) => {
     const res = await fetch(API_PATH, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cigarName: q })
+      body: JSON.stringify({ query: q }) // use "query"
     });
 
     if (!res.ok) {
@@ -83,45 +85,43 @@ form.onsubmit = async (e) => {
   }
 };
 
-// Handles thumbs up / thumbs down
+// Handle thumbs-up and thumbs-down feedback
 async function handleFeedback(cigarName, liked, button = null) {
   saveFeedback(cigarName, liked);
 
-  if (liked) {
-    alert(`You liked ${cigarName}`);
-    return;
-  }
-
-  alert(`You disliked ${cigarName}. Finding a new one…`);
-
-  if (!lastQuery) {
-    alert("No previous search to retry.");
-    return;
-  }
+  // Only act on 👎
+  if (liked || !lastQuery || !button) return;
 
   try {
+    const shownNames = Array.from(document.querySelectorAll('.card')).map(card =>
+      card.getAttribute('data-name')
+    );
+
     const res = await fetch(API_PATH, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cigarName: lastQuery })
+      body: JSON.stringify({ query: lastQuery })
     });
 
     const data = await res.json();
-    const newCigar = data.results?.[0];
-    if (!newCigar) {
-      alert("No replacement cigar found.");
+    const freshCigar = (data.results || []).find(
+      c => !shownNames.includes(c.name)
+    );
+
+    if (!freshCigar) {
+      console.warn("No fresh cigar found from OpenAI.");
       return;
     }
 
-    const newCardHTML = renderCigar(newCigar);
+    const newCardHTML = renderCigar(freshCigar);
     const oldCard = button.closest('.card');
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = newCardHTML;
     const newCard = tempDiv.firstElementChild;
 
     oldCard.replaceWith(newCard);
+
   } catch (err) {
-    console.error('Error fetching replacement:', err);
-    alert("Couldn’t get a new cigar from OpenAI.");
+    console.error('Error fetching replacement cigar:', err);
   }
 }
