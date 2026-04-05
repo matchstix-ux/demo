@@ -1,48 +1,36 @@
-// app.js — MatchSticks, rewritten for cleaner state management and safer UX
+// app.js — MatchSticks
 
 const API_PATH = '/.netlify/functions/recommend';
 const STATUS_AUTO_CLEAR_MS = 4000;
-const REPLACE_COOLDOWN_MS = 1000;
 
-const form = document.getElementById('searchForm');
-const queryInput = document.getElementById('query');
-const status = document.getElementById('status');
-const results = document.getElementById('results');
+const form        = document.getElementById('searchForm');
+const queryInput  = document.getElementById('query');
+const statusEl    = document.getElementById('status');
+const resultsEl   = document.getElementById('results');
+const clearBtn    = document.getElementById('clearBtn');
+
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
 
 const state = {
   currentQuery: '',
-  currentResults: [],
+  currentResults: [],   // the 3 cards on screen
+  buffer: [],           // extras returned by API, used for Replace
   liked: new Set(),
   disliked: new Set(),
   seen: new Set(),
   loading: false,
   abortController: null,
   statusTimer: null,
-  replaceCooldownUntil: 0
 };
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatTier(tier) {
-  if (!tier) return '';
-  switch (tier) {
-    case 'luxury':
-      return 'Luxury';
-    case 'premium':
-      return 'Premium';
-    case 'mid-range':
-      return 'Mid-Range';
-    case 'budget':
-      return 'Budget';
-    default:
-      return tier.charAt(0).toUpperCase() + tier.slice(1);
-  }
-}
-
-function escapeHtml(value) {
-  return String(value ?? '')
+function escapeHtml(v) {
+  return String(v ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -51,164 +39,168 @@ function escapeHtml(value) {
 }
 
 function getCigarKey(cigar) {
-  const brand = cigar?.brand?.trim()?.toLowerCase() || '';
-  const name = cigar?.name?.trim()?.toLowerCase() || '';
+  const brand = String(cigar?.brand ?? '').trim().toLowerCase();
+  const name  = String(cigar?.name  ?? '').trim().toLowerCase();
   return `${brand}::${name}`;
 }
 
-function isValidCigarKey(key) {
-  return typeof key === 'string' && key !== '::' && key.length > 2;
+function isValidCigar(c) {
+  return !!(c && typeof c === 'object' && c.name && c.brand);
 }
 
-function isValidCigar(cigar) {
-  return !!(cigar && typeof cigar === 'object' && cigar.name && cigar.brand);
+// Strength 4–10 → 0–100% for the bar, plus a colour class
+function strengthPercent(s) {
+  const n = Number(s) || 4;
+  return Math.round(((n - 4) / 6) * 100);
 }
 
-// ---------------------------------------------------------------------------
-// Serialization — Sets aren't JSON-safe, so explicit helpers keep it clean
-// ---------------------------------------------------------------------------
-
-function serializeState() {
-  return {
-    currentQuery: state.currentQuery,
-    currentResults: state.currentResults,
-    liked: [...state.liked],
-    disliked: [...state.disliked],
-    seen: [...state.seen]
-  };
+function strengthColor(s) {
+  const n = Number(s) || 4;
+  if (n <= 5) return 'var(--strength-low)';
+  if (n <= 7) return 'var(--strength-med)';
+  return 'var(--strength-high)';
 }
 
-function restoreState(saved) {
-  if (!saved) return;
-  state.currentQuery = saved.currentQuery || '';
-  state.currentResults = Array.isArray(saved.currentResults) ? saved.currentResults : [];
-  state.liked = new Set(saved.liked || []);
-  state.disliked = new Set(saved.disliked || []);
-  state.seen = new Set(saved.seen || []);
+function strengthLabel(s) {
+  const n = Number(s) || 4;
+  if (n <= 5) return 'Mild';
+  if (n <= 7) return 'Medium';
+  if (n <= 8) return 'Full';
+  return 'Extra Full';
 }
 
 // ---------------------------------------------------------------------------
-// Status messages — transient confirmations auto-clear; errors persist
+// Status
 // ---------------------------------------------------------------------------
 
-function setStatus(message, { persistent = false } = {}) {
-  if (state.statusTimer) {
-    clearTimeout(state.statusTimer);
-    state.statusTimer = null;
-  }
-
-  status.textContent = message;
-
-  if (message && !persistent) {
+function setStatus(msg, { persistent = false } = {}) {
+  if (state.statusTimer) { clearTimeout(state.statusTimer); state.statusTimer = null; }
+  statusEl.textContent = msg;
+  if (msg && !persistent) {
     state.statusTimer = setTimeout(() => {
-      // Only clear if the message hasn't been replaced in the meantime
-      if (status.textContent === message) {
-        status.textContent = '';
-      }
+      if (statusEl.textContent === msg) statusEl.textContent = '';
       state.statusTimer = null;
     }, STATUS_AUTO_CLEAR_MS);
   }
 }
 
 // ---------------------------------------------------------------------------
-// Rendering — targeted card updates preserve focus; full render on new search
+// Rendering
 // ---------------------------------------------------------------------------
 
+const EMPTY_STATE_HTML = `
+  <div class="empty-state">
+    <div class="ember">🔥</div>
+    <p>Search for a cigar, brand, or flavor profile</p>
+    <p>and we'll find your next perfect smoke.</p>
+    <div class="hint-chips">
+      <span class="hint-chip" data-query="spicy full body">Spicy &amp; Full Body</span>
+      <span class="hint-chip" data-query="creamy smooth">Creamy &amp; Smooth</span>
+      <span class="hint-chip" data-query="coffee chocolate">Coffee &amp; Chocolate</span>
+      <span class="hint-chip" data-query="cedar mild">Cedar &amp; Mild</span>
+      <span class="hint-chip" data-query="Padron">Padron style</span>
+      <span class="hint-chip" data-query="Opus X">Opus X style</span>
+    </div>
+  </div>`;
+
+function showEmptyState() {
+  resultsEl.innerHTML = EMPTY_STATE_HTML;
+  // Wire hint chips
+  resultsEl.querySelectorAll('.hint-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      queryInput.value = chip.dataset.query;
+      form.dispatchEvent(new Event('submit', { cancelable: true }));
+    });
+  });
+}
+
 function renderCigar(cigar, index) {
-  const flavorNotes = Array.isArray(cigar.flavorNotes)
+  const key       = getCigarKey(cigar);
+  const liked     = state.liked.has(key);
+  const pct       = strengthPercent(cigar.strength);
+  const color     = strengthColor(cigar.strength);
+  const label     = strengthLabel(cigar.strength);
+  const notes     = Array.isArray(cigar.flavorNotes)
     ? cigar.flavorNotes.map(escapeHtml).join(', ')
     : '';
-
-  const key = getCigarKey(cigar);
-  const liked = state.liked.has(key);
+  const price     = cigar.priceRange ? escapeHtml(cigar.priceRange) : '';
 
   return `
     <article class="card" data-index="${index}" data-key="${escapeHtml(key)}">
-      <div class="name">${escapeHtml(cigar.name)}</div>
-      <div class="brand">${escapeHtml(cigar.brand)}</div>
-      <div class="meta">
-        Strength: ${escapeHtml(cigar.strength || 'Unknown')}
-        &nbsp;|&nbsp;
-        Tier: <b>${escapeHtml(formatTier(cigar.priceTier) || 'Unknown')}</b>
+      <div class="card-name">${escapeHtml(cigar.name)}</div>
+      <div class="card-brand">${escapeHtml(cigar.brand)}</div>
+
+      <div class="card-meta">
+        ${price ? `<span class="price-badge">${price}</span>` : ''}
+        <span>${escapeHtml(label)}</span>
       </div>
-      <div class="notes">
-        Flavor Notes: ${flavorNotes || 'Not available'}
+
+      <div class="strength-wrap">
+        <span>Mild</span>
+        <div class="strength-track">
+          <div class="strength-fill"
+               style="width:${pct}%; background:${color}"></div>
+        </div>
+        <span>Strong</span>
       </div>
+
+      <div class="card-notes">
+        ${notes ? `${notes}` : '<em>No flavor notes available</em>'}
+      </div>
+
       <div class="actions">
-        <button
-          type="button"
-          class="like"
-          title="${liked ? 'Liked' : 'Like this cigar'}"
-          aria-pressed="${liked ? 'true' : 'false'}"
-        >
+        <button type="button" class="like ${liked ? 'liked' : ''}"
+                aria-pressed="${liked}"
+                title="${liked ? 'Remove like' : 'Like this cigar'}">
           ${liked ? '❤️ Liked' : '👍 Like'}
         </button>
-        <button
-          type="button"
-          class="dislike"
-          title="Replace this cigar"
-        >
+        <button type="button" class="dislike" title="Replace this recommendation">
           👎 Replace
         </button>
       </div>
-    </article>
-  `;
+    </article>`;
 }
 
 function renderResults() {
-  results.innerHTML = state.currentResults
-    .map((cigar, index) => renderCigar(cigar, index))
-    .join('');
-  syncButtonStates();
+  if (!state.currentResults.length) { showEmptyState(); return; }
+  resultsEl.innerHTML = `<div class="grid">${
+    state.currentResults.map((c, i) => renderCigar(c, i)).join('')
+  }</div>`;
+  syncButtons();
 }
 
-function updateCardAt(index, { restoreFocus = null } = {}) {
-  const card = results.querySelector(`.card[data-index="${index}"]`);
-  if (!card) {
-    renderResults();
-    return;
-  }
-
-  const temp = document.createElement('div');
-  temp.innerHTML = renderCigar(state.currentResults[index], index);
-  const newCard = temp.firstElementChild;
-
-  card.replaceWith(newCard);
-  syncButtonStates();
-
-  // Restore focus to the same button type the user just clicked
-  if (restoreFocus) {
-    const btn = newCard.querySelector(`.${restoreFocus}`);
-    if (btn) btn.focus();
-  }
+function updateCardAt(index) {
+  const card = resultsEl.querySelector(`.card[data-index="${index}"]`);
+  if (!card) { renderResults(); return; }
+  const tmp = document.createElement('div');
+  tmp.innerHTML = renderCigar(state.currentResults[index], index);
+  card.replaceWith(tmp.firstElementChild);
+  syncButtons();
 }
 
-function syncButtonStates() {
-  const disabled = state.loading;
-  results.querySelectorAll('.actions button').forEach((btn) => {
-    btn.disabled = disabled;
+function syncButtons() {
+  resultsEl.querySelectorAll('.actions button').forEach(btn => {
+    btn.disabled = state.loading;
   });
 }
 
 // ---------------------------------------------------------------------------
-// Loading state
+// Loading
 // ---------------------------------------------------------------------------
 
-function setLoading(isLoading) {
-  state.loading = isLoading;
-
-  const submitBtn = form.querySelector('button[type="submit"]');
-  if (submitBtn) {
-    submitBtn.disabled = isLoading;
-    submitBtn.textContent = isLoading ? 'Finding…' : 'Get 3 recs';
+function setLoading(v) {
+  state.loading = v;
+  const submit = form.querySelector('button[type="submit"]');
+  if (submit) {
+    submit.disabled = v;
+    submit.textContent = v ? 'Finding…' : 'Get Recs';
   }
-
-  queryInput.disabled = isLoading;
-  syncButtonStates();
+  queryInput.disabled = v;
+  syncButtons();
 }
 
 // ---------------------------------------------------------------------------
-// Abort control — cancel in-flight requests on new search
+// API
 // ---------------------------------------------------------------------------
 
 function abortInflight() {
@@ -218,103 +210,43 @@ function abortInflight() {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Normalization — de-duplication is owned client-side; server may also filter
-// via the `seen` payload, but we don't rely on it.
-// ---------------------------------------------------------------------------
-
-function normalizeRecommendations(items, { skipSeen = false } = {}) {
-  if (!Array.isArray(items)) return [];
-
-  const unique = [];
-  const used = new Set();
-
-  for (const cigar of items) {
-    if (!isValidCigar(cigar)) continue;
-
-    const key = getCigarKey(cigar);
-    if (!isValidCigarKey(key) || used.has(key)) continue;
-    if (state.disliked.has(key)) continue;
-    // Skip seen filtering on the initial search so we always show fresh results
-    if (!skipSeen && state.seen.has(key)) continue;
-
-    used.add(key);
-    unique.push(cigar);
-  }
-
-  return unique;
-}
-
-// ---------------------------------------------------------------------------
-// API layer
-// ---------------------------------------------------------------------------
-
-async function postRecommendations(payload, signal) {
-  const res = await fetch(API_PATH, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    signal
-  });
-
-  if (!res.ok) {
-    throw new Error(`Request failed with status ${res.status}`);
-  }
-
-  const data = await res.json();
-
-  if (!Array.isArray(data)) {
-    throw new Error('API did not return an array');
-  }
-
-  return data;
-}
-
-async function fetchRecommendations({ replace = false } = {}) {
+async function fetchRecommendations(statusMsg) {
   const query = state.currentQuery.trim();
-
   if (!query) {
-    setStatus('Please enter a cigar name, brand, or line.', { persistent: true });
-    results.innerHTML = '';
-    return [];
+    setStatus('Please enter a cigar name, brand, or flavor.', { persistent: true });
+    return null;
   }
 
-  // Cancel any in-flight request before starting a new one
   abortInflight();
   state.abortController = new AbortController();
-
   setLoading(true);
-  setStatus(replace ? 'Finding a better replacement…' : 'Finding your recs…', { persistent: true });
+  setStatus(statusMsg || 'Finding your recs…', { persistent: true });
 
   try {
     const payload = {
       query,
-      liked: [...state.liked],
+      liked:    [...state.liked],
       disliked: [...state.disliked],
-      seen: [...state.seen]
+      seen:     [...state.seen],
     };
 
-    const raw = await postRecommendations(payload, state.abortController.signal);
-    const normalized = normalizeRecommendations(raw, { skipSeen: !replace });
+    const res = await fetch(API_PATH, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: state.abortController.signal,
+    });
 
-    if (!normalized.length) {
-      if (!state.currentResults.length) {
-        results.innerHTML = '';
-        setStatus('No recommendations found — try a different search.', { persistent: true });
-      } else {
-        setStatus('No more fresh recommendations found for that search.', { persistent: true });
-      }
-      return [];
-    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error('Bad response format');
 
-    return normalized;
-  } catch (error) {
-    // Don't treat user-initiated aborts as errors
-    if (error.name === 'AbortError') {
-      return [];
-    }
-    console.error('Recommendation fetch failed:', error);
-    setStatus('Sorry — something went wrong. Please try again.', { persistent: true });
+    return data.filter(isValidCigar);
+
+  } catch (err) {
+    if (err.name === 'AbortError') return null;
+    console.error('Fetch error:', err);
+    setStatus('Something went wrong — please try again.', { persistent: true });
     return null;
   } finally {
     state.abortController = null;
@@ -323,155 +255,158 @@ async function fetchRecommendations({ replace = false } = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// State management
+// State helpers
 // ---------------------------------------------------------------------------
 
-function rememberResults(items) {
-  items.forEach((cigar) => {
-    state.seen.add(getCigarKey(cigar));
-  });
+function rememberSeen(items) {
+  items.forEach(c => state.seen.add(getCigarKey(c)));
 }
 
-function resetSessionForNewQuery(query) {
+function resetForQuery(query) {
   abortInflight();
-  state.currentQuery = query;
+  state.currentQuery   = query;
   state.currentResults = [];
+  state.buffer         = [];
   state.liked.clear();
   state.disliked.clear();
   state.seen.clear();
 }
 
 // ---------------------------------------------------------------------------
-// Event handlers
+// Handlers
 // ---------------------------------------------------------------------------
 
-async function handleSearchSubmit(event) {
-  event.preventDefault();
+async function handleSearch(e) {
+  e.preventDefault();
   if (state.loading) return;
 
   const query = queryInput.value.trim();
-
   if (!query) {
-    setStatus('Please enter a cigar name, brand, or line.', { persistent: true });
-    results.innerHTML = '';
+    setStatus('Please enter a cigar name, brand, or flavor.', { persistent: true });
     return;
   }
 
-  resetSessionForNewQuery(query);
-  results.innerHTML = '';
+  resetForQuery(query);
+  showEmptyState();
+  clearBtn.style.display = 'inline-flex';
 
-  const recs = await fetchRecommendations();
-  if (!recs || !recs.length) return;
+  const all = await fetchRecommendations('Finding your recs…');
+  if (!all || !all.length) {
+    setStatus('No recommendations found — try a different search.', { persistent: true });
+    return;
+  }
 
-  const topThree = recs.slice(0, 3);
-  state.currentResults = topThree;
-  rememberResults(topThree);
+  // First 3 go on screen, rest go into the replace buffer
+  state.currentResults = all.slice(0, 3);
+  state.buffer         = all.slice(3);
+  rememberSeen(all);
   renderResults();
   setStatus('');
 }
 
-async function replaceRecommendationAt(index) {
+async function handleReplace(index) {
   if (state.loading) return;
   if (index < 0 || index >= state.currentResults.length) return;
 
-  // Rate-limit rapid Replace clicks
-  if (Date.now() < state.replaceCooldownUntil) {
-    setStatus('Hold on — give it a second before replacing again.');
+  const outgoing = state.currentResults[index];
+  if (!outgoing) return;
+
+  state.disliked.add(getCigarKey(outgoing));
+
+  // Try the local buffer first — instant, no network call
+  const bufferMatch = state.buffer.findIndex(c => {
+    const k = getCigarKey(c);
+    return !state.disliked.has(k) &&
+           !state.currentResults.some(cur => getCigarKey(cur) === k);
+  });
+
+  if (bufferMatch !== -1) {
+    const [replacement] = state.buffer.splice(bufferMatch, 1);
+    state.currentResults[index] = replacement;
+    state.seen.add(getCigarKey(replacement));
+    updateCardAt(index);
+    setStatus('Swapped in a fresh pick.');
     return;
   }
 
-  const current = state.currentResults[index];
-  if (!current) return;
-
-  const currentKey = getCigarKey(current);
-  state.disliked.add(currentKey);
-
-  // Re-render immediately for visual feedback (buttons disabled via setLoading)
-  renderResults();
-
-  const recs = await fetchRecommendations({ replace: true });
-
-  // Start cooldown after the request completes
-  state.replaceCooldownUntil = Date.now() + REPLACE_COOLDOWN_MS;
-
-  if (!recs || !recs.length) {
-    setStatus('No better replacement found right now.', { persistent: true });
-    renderResults();
+  // Buffer exhausted — hit the API
+  const all = await fetchRecommendations('Finding a replacement…');
+  if (!all || !all.length) {
+    setStatus('No more replacements found right now.', { persistent: true });
     return;
   }
 
   const existingKeys = new Set(state.currentResults.map(getCigarKey));
-  existingKeys.add(currentKey);
+  existingKeys.add(getCigarKey(outgoing));
 
-  const replacement = recs.find((cigar) => {
-    const key = getCigarKey(cigar);
-    return !existingKeys.has(key);
-  });
-
+  const replacement = all.find(c => !existingKeys.has(getCigarKey(c)));
   if (!replacement) {
     setStatus('No new replacement available yet.', { persistent: true });
-    renderResults();
     return;
   }
 
+  // Refill buffer with leftovers
+  state.buffer = all.filter(c => getCigarKey(c) !== getCigarKey(replacement) &&
+                                  !existingKeys.has(getCigarKey(c)));
   state.currentResults[index] = replacement;
-  state.seen.add(getCigarKey(replacement));
+  rememberSeen([replacement, ...state.buffer]);
   updateCardAt(index);
-  setStatus('Updated one recommendation.');
+  setStatus('Swapped in a fresh pick.');
 }
 
-function toggleLikeAt(index, { restoreFocus = null } = {}) {
+function handleLike(index) {
   if (state.loading) return;
-  if (index < 0 || index >= state.currentResults.length) return;
-
   const cigar = state.currentResults[index];
   if (!cigar) return;
-
   const key = getCigarKey(cigar);
-
   if (state.liked.has(key)) {
     state.liked.delete(key);
-    setStatus('Removed from liked cigars.');
+    setStatus('Removed from liked.');
   } else {
     state.liked.add(key);
     state.disliked.delete(key);
-    setStatus('Saved as liked — future recs can lean this direction.');
+    setStatus('Liked — future recs can lean this way.');
   }
-
-  updateCardAt(index, { restoreFocus });
+  updateCardAt(index);
 }
 
-function getCardIndexFromEventTarget(target) {
-  const card = target.closest('.card');
-  if (!card) return -1;
-
-  const index = Number(card.getAttribute('data-index'));
-  return Number.isInteger(index) ? index : -1;
+function handleClear() {
+  abortInflight();
+  state.currentQuery   = '';
+  state.currentResults = [];
+  state.buffer         = [];
+  state.liked.clear();
+  state.disliked.clear();
+  state.seen.clear();
+  queryInput.value = '';
+  clearBtn.style.display = 'none';
+  setStatus('');
+  showEmptyState();
 }
 
 // ---------------------------------------------------------------------------
 // Event binding
 // ---------------------------------------------------------------------------
 
-form.addEventListener('submit', handleSearchSubmit);
+form.addEventListener('submit', handleSearch);
+clearBtn.addEventListener('click', handleClear);
 
-results.addEventListener('click', async (event) => {
-  const likeButton = event.target.closest('.like');
-  const dislikeButton = event.target.closest('.dislike');
+resultsEl.addEventListener('click', async e => {
+  const likeBtn    = e.target.closest('.like');
+  const dislikeBtn = e.target.closest('.dislike');
+  if (!likeBtn && !dislikeBtn) return;
 
-  if (!likeButton && !dislikeButton) return;
+  const card = e.target.closest('.card');
+  if (!card) return;
+  const index = parseInt(card.dataset.index, 10);
+  if (!Number.isInteger(index)) return;
 
-  const index = getCardIndexFromEventTarget(event.target);
-  if (index === -1) return;
-
-  if (likeButton) {
-    toggleLikeAt(index, { restoreFocus: 'like' });
-    return;
-  }
-
-  if (dislikeButton) {
-    await replaceRecommendationAt(index);
-  }
+  if (likeBtn)    handleLike(index);
+  if (dislikeBtn) await handleReplace(index);
 });
 
+// ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
 
+showEmptyState();
