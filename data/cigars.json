@@ -2176,5 +2176,838 @@
       "Dark Chocolate",
       "Coffee"
     ]
+  },
+  {
+    "name": "Famous Exclusives Cattivo Biondo Corona",
+    "brand": "Famous Exclusives",
+    "strength": 4,
+    "priceRange": "$2-$4",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Floral",
+      "Nuts"
+    ]
+  },
+  {
+    "name": "Famous Exclusives Buenos Naturales Corona",
+    "brand": "Famous Exclusives",
+    "strength": 5,
+    "priceRange": "$2-$4",
+    "flavorNotes": [
+      "Earth",
+      "Cedar",
+      "Spice",
+      "Nuts"
+    ]
+  },
+  {
+    "name": "Famous Exclusives Buenos Maduritos Corona",
+    "brand": "Famous Exclusives",
+    "strength": 6,
+    "priceRange": "$2-$4",
+    "flavorNotes": [
+      "Chocolate",
+      "Earth",
+      "Sweetness",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Famous Tucos Oscuros Toro",
+    "brand": "Famous Exclusives",
+    "strength": 7,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Dark Chocolate",
+      "Earth",
+      "Pepper",
+      "Leather"
+    ]
+  },
+  {
+    "name": "Famous Dominican 2000 Toro Habano",
+    "brand": "Famous Dominican",
+    "strength": 6,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Cedar",
+      "Nuts",
+      "Spice",
+      "Earth",
+      "Cream"
+    ]
+  },
+  {
+    "name": "Famous Dominican 2000 Toro San Andres",
+    "brand": "Famous Dominican",
+    "strength": 7,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Dark Chocolate",
+      "Earth",
+      "Pepper",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Famous Dominican 2000 Robusto Habano",
+    "brand": "Famous Dominican",
+    "strength": 6,
+    "priceRange": "$5-$7",
+    "flavorNotes": [
+      "Cedar",
+      "Nuts",
+      "Cream",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Famous Dominican 2000 Robusto San Andres",
+    "brand": "Famous Dominican",
+    "strength": 7,
+    "priceRange": "$5-$7",
+    "flavorNotes": [
+      "Earth",
+      "Chocolate",
+      "Pepper",
+      "Leather"
+    ]
+  },
+  {
+    "name": "Famous Dominican 2000 Gordo Habano",
+    "brand": "Famous Dominican",
+    "strength": 6,
+    "priceRange": "$6-$9",
+    "flavorNotes": [
+      "Cedar",
+      "Cream",
+      "Nuts",
+      "Light Spice"
+    ]
+  },
+  {
+    "name": "Famous Dominican 2000 Gordo San Andres",
+    "brand": "Famous Dominican",
+    "strength": 7,
+    "priceRange": "$6-$9",
+    "flavorNotes": [
+      "Dark Chocolate",
+      "Earth",
+      "Spice",
+      "Pepper"
+    ]
+  },
+  {
+    "name": "Famous Dominican 3000 Robusto",
+    "brand": "Famous Dominican",
+    "strength": 6,
+    "priceRange": "$4-$7",
+    "flavorNotes": [
+      "Cedar",
+      "Earth",
+      "Spice",
+      "Cream"
+    ]
+  },
+  {
+    "name": "Famous Dominican 3000 Toro",
+    "brand": "Famous Dominican",
+    "strength": 6,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Cedar",
+      "Nuts",
+      "Spice",
+      "Earth"
+    ]
+  },
+  {
+    "name": "Famous Dominican 3000 Churchill",
+    "brand": "Famous Dominican",
+    "strength": 6,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Cedar",
+      "Cream",
+      "Nuts",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Famous Dominican 3000 Gordo",
+    "brand": "Famous Dominican",
+    "strength": 6,
+    "priceRange": "$6-$9",
+    "flavorNotes": [
+      "Earth",
+      "Cedar",
+      "Nuts",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Famous Nicaraguan 5000 Sixty",
+    "brand": "Famous Nicaraguan",
+    "strength": 8,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Earth",
+      "Dark Chocolate",
+      "Leather",
+      "Spice",
+      "Coffee"
+    ]
+  },
+  {
+    "name": "Famous Nicaraguan 5000 Robusto",
+    "brand": "Famous Nicaraguan",
+    "strength": 7,
+    "priceRange": "$4-$7",
+    "flavorNotes": [
+      "Earth",
+      "Pepper",
+      "Cedar",
+      "Coffee"
+    ]
+  },
+  {
+    "name": "Famous Nicaraguan 5000 Toro",
+    "brand": "Famous Nicaraguan",
+    "strength": 7,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Earth",
+      "Spice",
+      "Leather",
+      "Coffee"
+    ]
+  },
+  {
+    "name": "El Gueguense Famous Exclusivo Toro",
+    "brand": "Foundation",
+    "strength": 7,
+    "priceRange": "$10-$14",
+    "flavorNotes": [
+      "Earth",
+      "Caramel",
+      "Coffee",
+      "Pepper",
+      "Nuts"
+    ]
+  },
+  {
+    "name": "Southern Draw Desert Rose Exclusivo Toro",
+    "brand": "Southern Draw",
+    "strength": 6,
+    "priceRange": "$9-$13",
+    "flavorNotes": [
+      "Oak",
+      "Sweetness",
+      "Floral",
+      "Spice",
+      "Cream"
+    ]
+  },
+  {
+    "name": "Alec Bradley Mata Fina Robusto",
+    "brand": "Alec Bradley",
+    "strength": 8,
+    "priceRange": "$7-$11",
+    "flavorNotes": [
+      "Earth",
+      "Sweetness",
+      "Spice",
+      "Cream",
+      "Leather"
+    ]
+  },
+  {
+    "name": "Oliva Inferno Robusto",
+    "brand": "Oliva",
+    "strength": 8,
+    "priceRange": "$6-$9",
+    "flavorNotes": [
+      "Earth",
+      "Dark Chocolate",
+      "Wood",
+      "Leather",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Perdomo Cuban Parejo Rothschild",
+    "brand": "Perdomo",
+    "strength": 6,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Cedar",
+      "Coffee",
+      "Cream",
+      "Caramel",
+      "Nuts"
+    ]
+  },
+  {
+    "name": "Rocky Patel American Market Selection Robusto",
+    "brand": "Rocky Patel",
+    "strength": 5,
+    "priceRange": "$6-$9",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Romeo y Julieta Capulet Toro",
+    "brand": "Romeo y Julieta",
+    "strength": 6,
+    "priceRange": "$6-$9",
+    "flavorNotes": [
+      "Cream",
+      "Nuts",
+      "Cedar",
+      "Sweetness",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Don Tomas SEC Robusto",
+    "brand": "Don Tomas",
+    "strength": 5,
+    "priceRange": "$4-$6",
+    "flavorNotes": [
+      "Cream",
+      "Toast",
+      "Cedar",
+      "Nuts",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Plasencia Immortal Robusto",
+    "brand": "Plasencia",
+    "strength": 7,
+    "priceRange": "$6-$9",
+    "flavorNotes": [
+      "Sweetness",
+      "Spice",
+      "Earth",
+      "Cedar"
+    ]
+  },
+  {
+    "name": "Aganorsa Leaf Famous 80th Anniversary Robusto",
+    "brand": "Aganorsa Leaf",
+    "strength": 7,
+    "priceRange": "$8-$12",
+    "flavorNotes": [
+      "Coffee",
+      "Bread",
+      "Fruit",
+      "Floral",
+      "Pepper"
+    ]
+  },
+  {
+    "name": "Punch Sucker Punch Robusto",
+    "brand": "Punch",
+    "strength": 7,
+    "priceRange": "$10-$14",
+    "flavorNotes": [
+      "Earth",
+      "Cedar",
+      "Spice",
+      "Leather"
+    ]
+  },
+  {
+    "name": "Punch Sucker Punch Toro",
+    "brand": "Punch",
+    "strength": 7,
+    "priceRange": "$12-$16",
+    "flavorNotes": [
+      "Earth",
+      "Spice",
+      "Cedar",
+      "Pepper",
+      "Leather"
+    ]
+  },
+  {
+    "name": "7 Deadly Sins Robusto",
+    "brand": "7 Deadly",
+    "strength": 8,
+    "priceRange": "$12-$16",
+    "flavorNotes": [
+      "Dark Chocolate",
+      "Pepper",
+      "Earth",
+      "Leather",
+      "Spice"
+    ]
+  },
+  {
+    "name": "7 Deadly Sins Toro",
+    "brand": "7 Deadly",
+    "strength": 8,
+    "priceRange": "$13-$17",
+    "flavorNotes": [
+      "Dark Chocolate",
+      "Earth",
+      "Spice",
+      "Coffee",
+      "Pepper"
+    ]
+  },
+  {
+    "name": "Famous VSL Nicaragua Toro",
+    "brand": "Famous Exclusives",
+    "strength": 7,
+    "priceRange": "$4-$7",
+    "flavorNotes": [
+      "Earth",
+      "Pepper",
+      "Spice",
+      "Cedar"
+    ]
+  },
+  {
+    "name": "La Gloria Cubana Gilded Age Gordo",
+    "brand": "La Gloria Cubana",
+    "strength": 7,
+    "priceRange": "$12-$16",
+    "flavorNotes": [
+      "Earth",
+      "Cedar",
+      "Spice",
+      "Cream",
+      "Leather"
+    ]
+  },
+  {
+    "name": "Asylum Lobotomy Corojo Double Toro",
+    "brand": "Asylum",
+    "strength": 8,
+    "priceRange": "$7-$10",
+    "flavorNotes": [
+      "Pepper",
+      "Earth",
+      "Spice",
+      "Dark Chocolate",
+      "Leather"
+    ]
+  },
+  {
+    "name": "AJ Fernandez New World Dorado Toro",
+    "brand": "AJ Fernandez",
+    "strength": 7,
+    "priceRange": "$9-$13",
+    "flavorNotes": [
+      "Earth",
+      "Sweetness",
+      "Spice",
+      "Leather",
+      "Cedar"
+    ]
+  },
+  {
+    "name": "Tabak Especial Dulce Toro",
+    "brand": "Drew Estate",
+    "strength": 5,
+    "priceRange": "$8-$11",
+    "flavorNotes": [
+      "Espresso",
+      "Cream",
+      "Chocolate",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Kentucky Fire Cured Robusto",
+    "brand": "Drew Estate",
+    "strength": 8,
+    "priceRange": "$8-$12",
+    "flavorNotes": [
+      "Smoke",
+      "Earth",
+      "Leather",
+      "Pepper",
+      "Dark Chocolate"
+    ]
+  },
+  {
+    "name": "Perdomo Habano Bourbon Barrel-Aged Maduro Toro",
+    "brand": "Perdomo",
+    "strength": 7,
+    "priceRange": "$9-$13",
+    "flavorNotes": [
+      "Dark Chocolate",
+      "Coffee",
+      "Earth",
+      "Sweetness",
+      "Leather"
+    ]
+  },
+  {
+    "name": "Davidoff Nicaragua Robusto",
+    "brand": "Davidoff",
+    "strength": 7,
+    "priceRange": "$18-$24",
+    "flavorNotes": [
+      "Pepper",
+      "Coffee",
+      "Chocolate",
+      "Spice",
+      "Cream"
+    ]
+  },
+  {
+    "name": "Davidoff Escurio Gran Toro",
+    "brand": "Davidoff",
+    "strength": 7,
+    "priceRange": "$20-$28",
+    "flavorNotes": [
+      "Dark Chocolate",
+      "Coffee",
+      "Spice",
+      "Earth"
+    ]
+  },
+  {
+    "name": "Long Live The Queen Ace of Spades",
+    "brand": "Caldwell",
+    "strength": 7,
+    "priceRange": "$12-$16",
+    "flavorNotes": [
+      "Cedar",
+      "Cream",
+      "Sweetness",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Caldwell Eastern Standard Robusto",
+    "brand": "Caldwell",
+    "strength": 6,
+    "priceRange": "$11-$15",
+    "flavorNotes": [
+      "Cedar",
+      "Nuts",
+      "Cream",
+      "Pepper"
+    ]
+  },
+  {
+    "name": "Cohiba Nicaragua Robusto",
+    "brand": "Cohiba",
+    "strength": 7,
+    "priceRange": "$12-$16",
+    "flavorNotes": [
+      "Pepper",
+      "Earth",
+      "Spice",
+      "Cedar",
+      "Coffee"
+    ]
+  },
+  {
+    "name": "Partagas Black Label Robusto",
+    "brand": "Partagas",
+    "strength": 8,
+    "priceRange": "$8-$12",
+    "flavorNotes": [
+      "Earth",
+      "Leather",
+      "Pepper",
+      "Spice",
+      "Coffee"
+    ]
+  },
+  {
+    "name": "Partagas 1845 Extra Fuerte Toro",
+    "brand": "Partagas",
+    "strength": 9,
+    "priceRange": "$9-$13",
+    "flavorNotes": [
+      "Pepper",
+      "Earth",
+      "Leather",
+      "Coffee",
+      "Dark Chocolate"
+    ]
+  },
+  {
+    "name": "Don Pepin Garcia Blue Label Robusto",
+    "brand": "Don Pepin Garcia",
+    "strength": 8,
+    "priceRange": "$8-$12",
+    "flavorNotes": [
+      "Pepper",
+      "Earth",
+      "Coffee",
+      "Leather",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Don Pepin Garcia Series JJ Toro",
+    "brand": "Don Pepin Garcia",
+    "strength": 9,
+    "priceRange": "$9-$13",
+    "flavorNotes": [
+      "Pepper",
+      "Earth",
+      "Spice",
+      "Coffee",
+      "Leather"
+    ]
+  },
+  {
+    "name": "Montecristo Platinum Robusto",
+    "brand": "Montecristo",
+    "strength": 6,
+    "priceRange": "$10-$14",
+    "flavorNotes": [
+      "Cedar",
+      "Cream",
+      "Nuts",
+      "Spice",
+      "Earth"
+    ]
+  },
+  {
+    "name": "H. Upmann Vintage Cameroon Robusto",
+    "brand": "H. Upmann",
+    "strength": 6,
+    "priceRange": "$10-$14",
+    "flavorNotes": [
+      "Sweetness",
+      "Cedar",
+      "Nuts",
+      "Spice",
+      "Cream"
+    ]
+  },
+  {
+    "name": "Crux Bull & Bear Robusto",
+    "brand": "Crux",
+    "strength": 7,
+    "priceRange": "$10-$14",
+    "flavorNotes": [
+      "Pepper",
+      "Earth",
+      "Leather",
+      "Coffee",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Crux Du Connoisseur No. 3",
+    "brand": "Crux",
+    "strength": 6,
+    "priceRange": "$12-$16",
+    "flavorNotes": [
+      "Cedar",
+      "Cream",
+      "Nuts",
+      "Floral",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Oscar Valladares Leaf by Oscar Connecticut Toro",
+    "brand": "Oscar Valladares",
+    "strength": 5,
+    "priceRange": "$7-$10",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Floral"
+    ]
+  },
+  {
+    "name": "Oscar Valladares Leaf by Oscar Maduro Toro",
+    "brand": "Oscar Valladares",
+    "strength": 7,
+    "priceRange": "$7-$10",
+    "flavorNotes": [
+      "Dark Chocolate",
+      "Earth",
+      "Coffee",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "ADVentura The Conqueror Robusto",
+    "brand": "ADVentura",
+    "strength": 7,
+    "priceRange": "$11-$15",
+    "flavorNotes": [
+      "Spice",
+      "Leather",
+      "Earth",
+      "Coffee",
+      "Cedar"
+    ]
+  },
+  {
+    "name": "ADVentura The Navigator Toro",
+    "brand": "ADVentura",
+    "strength": 6,
+    "priceRange": "$10-$14",
+    "flavorNotes": [
+      "Cedar",
+      "Cream",
+      "Nuts",
+      "Sweetness",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Gran Habano Corojo #5 Robusto",
+    "brand": "Gran Habano",
+    "strength": 8,
+    "priceRange": "$7-$10",
+    "flavorNotes": [
+      "Pepper",
+      "Earth",
+      "Spice",
+      "Leather",
+      "Coffee"
+    ]
+  },
+  {
+    "name": "Warped Futuro Robusto",
+    "brand": "Warped",
+    "strength": 6,
+    "priceRange": "$10-$14",
+    "flavorNotes": [
+      "Cedar",
+      "Cream",
+      "Pepper",
+      "Nuts",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Warped Maestro del Tiempo 6102 Toro",
+    "brand": "Warped",
+    "strength": 7,
+    "priceRange": "$14-$18",
+    "flavorNotes": [
+      "Cedar",
+      "Earth",
+      "Spice",
+      "Coffee",
+      "Leather"
+    ]
+  },
+  {
+    "name": "Fratello Navetta Espressivo Robusto",
+    "brand": "Fratello",
+    "strength": 7,
+    "priceRange": "$8-$12",
+    "flavorNotes": [
+      "Espresso",
+      "Cocoa",
+      "Spice",
+      "Earth",
+      "Cream"
+    ]
+  },
+  {
+    "name": "Southern Draw Cedrus Robusto",
+    "brand": "Southern Draw",
+    "strength": 6,
+    "priceRange": "$9-$13",
+    "flavorNotes": [
+      "Cedar",
+      "Sweetness",
+      "Cream",
+      "Nuts",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Southern Draw Rose of Sharon Habano Robusto",
+    "brand": "Southern Draw",
+    "strength": 6,
+    "priceRange": "$9-$12",
+    "flavorNotes": [
+      "Sweetness",
+      "Floral",
+      "Cedar",
+      "Cream",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Crowned Heads Jericho Hill Willy Lee Robusto",
+    "brand": "Crowned Heads",
+    "strength": 8,
+    "priceRange": "$14-$18",
+    "flavorNotes": [
+      "Earth",
+      "Pepper",
+      "Leather",
+      "Dark Chocolate",
+      "Spice"
+    ]
+  },
+  {
+    "name": "Crowned Heads Le Patite Debutante Robusto",
+    "brand": "Crowned Heads",
+    "strength": 5,
+    "priceRange": "$11-$15",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Floral",
+      "Nuts",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Brick House Mighty Mighty Gordo",
+    "brand": "Brick House",
+    "strength": 7,
+    "priceRange": "$7-$10",
+    "flavorNotes": [
+      "Earth",
+      "Leather",
+      "Cedar",
+      "Spice",
+      "Coffee"
+    ]
+  },
+  {
+    "name": "Diesel Whiskey Row Robusto",
+    "brand": "Diesel",
+    "strength": 7,
+    "priceRange": "$8-$12",
+    "flavorNotes": [
+      "Oak",
+      "Sweetness",
+      "Vanilla",
+      "Spice",
+      "Earth"
+    ]
+  },
+  {
+    "name": "Diesel Hair of the Dog Robusto",
+    "brand": "Diesel",
+    "strength": 8,
+    "priceRange": "$9-$13",
+    "flavorNotes": [
+      "Pepper",
+      "Earth",
+      "Dark Chocolate",
+      "Leather",
+      "Spice"
+    ]
   }
 ]
