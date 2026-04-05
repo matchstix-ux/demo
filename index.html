@@ -246,37 +246,6 @@
       border-color: #4a7a4a;
     }
 
-    /* ── Mode toggle ── */
-    .mode-toggle {
-      display: flex;
-      gap: 0;
-      margin-bottom: 16px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 3px;
-      width: fit-content;
-    }
-    .mode-btn {
-      padding: 7px 18px;
-      border: none;
-      border-radius: 8px;
-      background: transparent;
-      color: var(--muted);
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-    }
-    .mode-btn.active {
-      background: var(--surface-2);
-      color: var(--text);
-    }
-    .mode-btn.active.pair {
-      background: linear-gradient(135deg, #1a2a3a, #1e3040);
-      color: #7ec8d8;
-    }
-
     /* ── AI why explanation ── */
     .card-why {
       font-size: 0.85rem;
@@ -307,15 +276,11 @@
     </header>
 
     <section class="panel">
-      <div class="mode-toggle">
-        <button type="button" id="modeFind" class="mode-btn active">Find a Cigar</button>
-        <button type="button" id="modePair" class="mode-btn">Pair With...</button>
-      </div>
       <form id="searchForm" novalidate>
-        <label for="query" id="queryLabel">Enter a cigar, brand, flavor, or style</label>
+        <label for="query" id="queryLabel">Tell us what you like — we'll find your next smoke</label>
         <div class="controls">
           <input id="query" type="text"
-                 placeholder="e.g. Opus X, spicy, full body, creamy" />
+                 placeholder="e.g. Padron, spicy &amp; full body, bourbon, after dinner steak" />
           <button type="submit" class="btn btn-primary">Get Recs</button>
           <button type="button" id="clearBtn" class="btn btn-ghost"
                   style="display:none">Clear</button>

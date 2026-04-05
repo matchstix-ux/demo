@@ -8,9 +8,6 @@ const queryInput  = document.getElementById('query');
 const statusEl    = document.getElementById('status');
 const resultsEl   = document.getElementById('results');
 const clearBtn    = document.getElementById('clearBtn');
-const modeFind    = document.getElementById('modeFind');
-const modePair    = document.getElementById('modePair');
-const queryLabel  = document.getElementById('queryLabel');
 
 // ---------------------------------------------------------------------------
 // State
@@ -41,7 +38,7 @@ const state = {
   loading: false,
   abortController: null,
   statusTimer: null,
-  pairingMode: false,   // true = Pair With mode
+  // pairingMode removed — GPT auto-detects intent from query
 };
 
 // ---------------------------------------------------------------------------
@@ -107,78 +104,37 @@ function setStatus(msg, { persistent = false } = {}) {
 // Rendering
 // ---------------------------------------------------------------------------
 
-const EMPTY_STATE_FIND = `
+const EMPTY_STATE_HTML = `
   <div class="empty-state">
     <div class="ember">🔥</div>
-    <p>Search for a cigar, brand, or flavor profile</p>
-    <p>and AI will find your next perfect smoke.</p>
+    <p>Tell us what you like — cigar, flavor, or what you're drinking.</p>
+    <p>AI finds your perfect next smoke.</p>
     <div class="hint-chips">
-      <span class="hint-chip" data-query="spicy full body">Spicy &amp; Full Body</span>
-      <span class="hint-chip" data-query="creamy smooth">Creamy &amp; Smooth</span>
-      <span class="hint-chip" data-query="coffee chocolate">Coffee &amp; Chocolate</span>
-      <span class="hint-chip" data-query="cedar mild">Cedar &amp; Mild</span>
+      <span class="hint-chip" data-query="spicy and full body">Spicy &amp; Full Body</span>
+      <span class="hint-chip" data-query="creamy and smooth">Creamy &amp; Smooth</span>
       <span class="hint-chip" data-query="like a Padron but cheaper">Like Padron, cheaper</span>
-      <span class="hint-chip" data-query="gift for someone who smokes Cohibas">Gift for Cohiba smoker</span>
-    </div>
-  </div>`;
-
-const EMPTY_STATE_PAIR = `
-  <div class="empty-state">
-    <div class="ember">🥃</div>
-    <p>Tell us what you're drinking or eating</p>
-    <p>and AI will find the perfect cigar to pair with it.</p>
-    <div class="hint-chips">
-      <span class="hint-chip" data-query="bourbon">Bourbon</span>
-      <span class="hint-chip" data-query="single malt scotch">Single Malt Scotch</span>
-      <span class="hint-chip" data-query="espresso">Espresso</span>
-      <span class="hint-chip" data-query="ribeye steak">Ribeye Steak</span>
-      <span class="hint-chip" data-query="red wine">Red Wine</span>
-      <span class="hint-chip" data-query="craft IPA beer">Craft IPA</span>
+      <span class="hint-chip" data-query="gift for someone who smokes Cohibas">Gift for a Cohiba smoker</span>
+      <span class="hint-chip" data-query="bourbon">Pairing: Bourbon</span>
+      <span class="hint-chip" data-query="ribeye steak">Pairing: Ribeye</span>
+      <span class="hint-chip" data-query="single malt scotch">Pairing: Scotch</span>
+      <span class="hint-chip" data-query="espresso">Pairing: Espresso</span>
     </div>
   </div>`;
 
 function showEmptyState() {
   const likedCount = state.liked.size;
-  const memoryNote = likedCount > 0 && !state.pairingMode
+  const memoryNote = likedCount > 0
     ? `<p style="color:var(--accent-2);margin-top:8px;font-size:0.85rem">♥ ${likedCount} liked cigar${likedCount > 1 ? 's' : ''} remembered from your last session</p>`
     : '';
 
-  const template = state.pairingMode ? EMPTY_STATE_PAIR : EMPTY_STATE_FIND;
-  resultsEl.innerHTML = template.replace('</div>\n  </div>', `${memoryNote}</div>\n  </div>`);
+  resultsEl.innerHTML = EMPTY_STATE_HTML.replace('</div>\n  </div>', `${memoryNote}</div>\n  </div>`);
 
-  // Wire hint chips
   resultsEl.querySelectorAll('.hint-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       queryInput.value = chip.dataset.query;
       form.dispatchEvent(new Event('submit', { cancelable: true }));
     });
   });
-}
-
-function setMode(pairing) {
-  state.pairingMode = pairing;
-  modeFind.classList.toggle('active', !pairing);
-  modeFind.classList.remove('pair');
-  modePair.classList.toggle('active', pairing);
-  modePair.classList.toggle('pair', pairing);
-
-  if (pairing) {
-    queryLabel.textContent = 'What are you drinking or eating?';
-    queryInput.placeholder = 'e.g. bourbon, espresso, ribeye steak, red wine';
-  } else {
-    queryLabel.textContent = 'Enter a cigar, brand, flavor, or style';
-    queryInput.placeholder = 'e.g. Opus X, spicy, full body, creamy';
-  }
-
-  // Reset and show the right empty state
-  if (!state.loading) {
-    state.currentResults = [];
-    state.buffer = [];
-    queryInput.value = '';
-    clearBtn.style.display = 'none';
-    setStatus('');
-    showEmptyState();
-  }
 }
 
 function renderCigar(cigar, index) {
@@ -303,7 +259,6 @@ async function fetchRecommendations(statusMsg) {
       liked:    [...state.liked],
       disliked: [...state.disliked],
       seen:     [...state.seen],
-      pairing:  state.pairingMode,
     };
 
     const res = await fetch(API_PATH, {
@@ -370,9 +325,7 @@ async function handleSearch(e) {
   showEmptyState();
   clearBtn.style.display = 'inline-flex';
 
-  const all = await fetchRecommendations(
-    state.pairingMode ? 'AI is finding your perfect pairing…' : 'AI is selecting your best matches…'
-  );
+  const all = await fetchRecommendations('AI is finding your best matches…');
   if (!all || !all.length) {
     setStatus('No recommendations found — try a different search.', { persistent: true });
     return;
@@ -474,9 +427,6 @@ function handleClear() {
 
 form.addEventListener('submit', handleSearch);
 clearBtn.addEventListener('click', handleClear);
-modeFind.addEventListener('click', () => setMode(false));
-modePair.addEventListener('click', () => setMode(true));
-
 resultsEl.addEventListener('click', async e => {
   const likeBtn    = e.target.closest('.like');
   const dislikeBtn = e.target.closest('.dislike');

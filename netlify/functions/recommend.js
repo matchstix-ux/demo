@@ -237,7 +237,7 @@ function strengthLabel(s) {
   return 'extra full-bodied';
 }
 
-async function aiSelectAndExplain(query, candidates, options = {}) {
+async function aiSelectAndExplain(query, candidates) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return { results: candidates.slice(0, 6).map(c => ({ ...c, why: null })), aiUsed: false };
 
@@ -245,54 +245,38 @@ async function aiSelectAndExplain(query, candidates, options = {}) {
     `${i}: ${c.name} by ${c.brand} | ${strengthLabel(c.strength)} | ${c.priceRange} | notes: ${c.flavorNotes.join(', ')}`
   ).join('\n');
 
-  const isPairing = !!options.pairing;
+  const prompt = `You are an expert cigar sommelier at a premium retailer.
 
-  const prompt = isPairing
-    ? `You are an expert cigar sommelier at a premium retailer.
+A customer typed: "${query}"
 
-A customer wants to pair a cigar with: "${query}"
+First, read the intent:
+- If the query describes a food or drink (bourbon, espresso, steak, red wine, scotch, IPA, coffee, etc.) — treat this as a PAIRING request. Select cigars that complement or contrast the flavors of that item using classic pairing principles.
+- If the query describes a cigar, brand, flavor profile, occasion, or preference (spicy, full body, like a Padron, after dinner smoke, gift for someone, etc.) — treat this as a PREFERENCE request. Select cigars that best match that taste or need.
+- If it's both (e.g. "bourbon and spicy") — honor both signals.
 
-Here are ${candidates.length} cigar candidates (index: name | strength | price | flavor notes):
+Pairing principles to apply when relevant:
+- Bourbon/whiskey → oak, leather, vanilla, caramel notes complement; pepper and spice contrast nicely
+- Espresso/coffee → echo with cocoa, chocolate, cream; avoid floral or citrus
+- Steak/red meat → bold, full-bodied, earthy to match the richness
+- Red wine → full-bodied and spicy for tannic reds; medium for lighter reds
+- Scotch/single malt → leather, earth, oak to echo smokiness and complexity
+- Craft IPA → spice and pepper to match the hops
+- Light fare/seafood → mild, creamy, strength under 6
+
+Here are ${candidates.length} candidates (index: name | strength | price | notes):
 ${cigarList}
 
 Your task:
-1. Select the 6 cigars that pair best with "${query}". Use your knowledge of classic pairing principles:
-   - Bourbon/whiskey: complement with vanilla, oak, leather, caramel; contrast with pepper and spice
-   - Espresso/coffee: echo with cocoa, chocolate, cream; avoid floral or citrus
-   - Steak/red meat: bold, full-bodied, earthy; match the richness
-   - Wine (red): tannic reds love full-bodied, spicy cigars; lighter reds prefer medium
-   - Beer (craft): IPAs pair with spice/pepper; stouts with chocolate/cream
-   - Scotch/single malt: peaty/smoky profiles love leather and earth
-   - Light spirits (gin, white rum): mild, floral, or citrus-forward cigars
-   - Seafood/light fare: mild, creamy, under strength 6
-2. For each selected cigar, write ONE sentence (max 18 words) explaining WHY it pairs with "${query}". Be specific about the flavor interaction. Use second person.
+1. Select the 6 cigars that best serve the customer's intent
+2. For each, write ONE sentence (max 18 words) explaining why. Be specific — mention the flavor connection, pairing chemistry, or profile match. Use second person.
 
 Rules:
-- You MUST return exactly 6 selections
-- Use the exact index numbers from the list above
-- Vary the strength and price across selections
-- Explain the pairing chemistry, not just the cigar
+- Exactly 6 selections
+- Use the exact index numbers above
+- Vary strength and price across selections
+- Never explain what the cigar tastes like in isolation — always connect it to what the customer asked for
 
-Respond with ONLY valid JSON in this exact shape (no markdown, no extra text):
-{"selected":[{"index":0,"why":"..."},{"index":3,"why":"..."}]}`
-    : `You are an expert cigar sommelier at a premium retailer.
-
-A customer searched for: "${query}"
-
-Here are ${candidates.length} pre-filtered candidates (index: name | strength | price | flavor notes):
-${cigarList}
-
-Your task:
-1. Select the 6 cigars that best match the customer's search. Consider the full intent — flavor mood, occasion cues ("after dinner", "on the golf course"), comparisons ("like a Padron but cheaper"), strength preferences, and price signals. Go beyond keyword matching.
-2. For each selected cigar, write ONE sentence (max 18 words) explaining why it matches. Be specific. Use second person.
-
-Rules:
-- You MUST return exactly 6 selections
-- Use the exact index numbers from the list above
-- Vary your selections — don't pick 6 similar cigars
-- If the query is vague, favor diversity of profile
-
-Respond with ONLY valid JSON in this exact shape (no markdown, no extra text):
+Respond with ONLY valid JSON, no markdown:
 {"selected":[{"index":0,"why":"..."},{"index":3,"why":"..."}]}`;
 
   try {
@@ -539,7 +523,7 @@ exports.handler = async function (event) {
 
     // GPT selects the best 6 from the 20 candidates and writes a why for each.
     // Falls back to top-6 scorer results with no why if AI is unavailable.
-    const { results } = await aiSelectAndExplain(rawQuery || 'cigar recommendation', candidates, { pairing: !!body.pairing });
+    const { results } = await aiSelectAndExplain(rawQuery || 'cigar recommendation', candidates);
 
     return { statusCode: 200, headers: CORS, body: JSON.stringify(results) };
 
