@@ -179,6 +179,13 @@ function renderCigar(cigar, index) {
         <button type="button" class="dislike" title="Replace this recommendation">
           👎 Replace
         </button>
+        <a class="btn-buy"
+           href="https://www.famous-smoke.com/catalogsearch/result/?q=${encodeURIComponent(cigar.name)}"
+           target="_blank"
+           rel="noopener noreferrer"
+           title="Find at Famous Smoke Shop">
+          🛒 Buy
+        </a>
       </div>
     </article>`;
 }
