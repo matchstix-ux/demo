@@ -193,6 +193,68 @@ const ALL_CIGARS = [
 
 
 // ---------------------------------------------------------------------------
+// OpenAI — generate a "why this cigar?" explanation for each recommendation.
+// Falls back gracefully if the API key is absent or the call fails.
+// ---------------------------------------------------------------------------
+
+async function generateWhyExplanations(query, cigars) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return cigars.map(c => ({ ...c, why: null }));
+
+  // Build a compact cigar list for the prompt
+  const cigarList = cigars.map((c, i) =>
+    `${i + 1}. ${c.name} by ${c.brand} — ${c.strength <= 5 ? 'mild' : c.strength <= 7 ? 'medium' : 'full-bodied'}, ${c.priceRange}, notes: ${c.flavorNotes.join(', ')}`
+  ).join('\n');
+
+  const prompt = `You are a knowledgeable cigar sommelier. A customer searched for: "${query}"
+
+You've selected these cigars for them:
+${cigarList}
+
+For each cigar, write one concise sentence (max 20 words) explaining exactly WHY it matches this search. Be specific — mention the flavor connection, strength match, or value. Use second person ("You'll love...", "Perfect if...", "Matches your...").
+
+Respond with ONLY a JSON array of strings, one per cigar, in the same order. Example:
+["Matches your espresso craving with deep cocoa and a full body.", "Perfect if you want bold pepper without the price tag."]`;
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        temperature: 0.7,
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    if (!res.ok) {
+      console.error('OpenAI error:', res.status, await res.text());
+      return cigars.map(c => ({ ...c, why: null }));
+    }
+
+    const data = await res.json();
+    const raw = data.choices?.[0]?.message?.content?.trim() || '[]';
+
+    // Strip markdown code fences if present
+    const cleaned = raw.replace(/^```json?\s*/i, '').replace(/\s*```$/, '').trim();
+    const explanations = JSON.parse(cleaned);
+
+    return cigars.map((c, i) => ({
+      ...c,
+      why: typeof explanations[i] === 'string' ? explanations[i] : null,
+    }));
+
+  } catch (err) {
+    console.error('OpenAI call failed:', err.message);
+    return cigars.map(c => ({ ...c, why: null }));
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Flavor synonym map — query terms → flavor note keywords in the data
 // ---------------------------------------------------------------------------
 const FLAVOR_SYNONYMS = {
@@ -368,6 +430,9 @@ exports.handler = async function (event) {
       );
       results = results.concat(backup).slice(0, 6);
     }
+
+    // Generate AI "why" explanations for all candidates in one API call
+    results = await generateWhyExplanations(rawQuery || 'cigar recommendation', results);
 
     return { statusCode: 200, headers: CORS, body: JSON.stringify(results) };
 

@@ -147,6 +147,7 @@ function renderCigar(cigar, index) {
       <div class="card-notes">
         ${notes ? `${notes}` : '<em>No flavor notes available</em>'}
       </div>
+      ${cigar.why ? `<div class="card-why">${escapeHtml(cigar.why)}</div>` : ''}
 
       <div class="actions">
         <button type="button" class="like ${liked ? 'liked' : ''}"
