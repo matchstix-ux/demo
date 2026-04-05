@@ -336,6 +336,204 @@ Respond with ONLY valid JSON, no markdown:
 }
 
 // ---------------------------------------------------------------------------
+// Brand alias map + accent normalization for fuzzy exclusion.
+// Covers misspellings, accent variants, and common shorthand.
+// Each entry maps one or more aliases → the canonical normalized brand token.
+// We normalize BOTH the query tokens AND the cigar brand/name before matching.
+// ---------------------------------------------------------------------------
+
+function stripAccents(str) {
+  // Decompose unicode then strip combining diacritics (é→e, ó→o, ñ→n, etc.)
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function normForExclusion(str) {
+  return stripAccents(norm(str)).replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+// alias → canonical (both already accent-stripped + lowercased)
+const BRAND_ALIASES = {
+  // Padron
+  'padron':           'padron',
+  'padrón':           'padron',
+  'padron 1926':      'padron',
+  'padron 1964':      'padron',
+  'serie 1926':       'padron',
+
+  // Arturo Fuente / Opus X
+  'fuente':           'arturo fuente',
+  'arturo fuente':    'arturo fuente',
+  'opus x':           'arturo fuente',
+  'opusx':            'arturo fuente',
+  'opus':             'arturo fuente',
+  'fuente fuente':    'arturo fuente',
+  'don carlos':       'arturo fuente',
+  'hemingway':        'arturo fuente',
+
+  // Liga Privada / Drew Estate
+  'liga privada':     'drew estate',
+  'liga':             'drew estate',
+  'liga9':            'drew estate',
+  'liga 9':           'drew estate',
+  'no 9':             'drew estate',
+  'undercrown':       'drew estate',
+  'acid':             'drew estate',
+  'drew estate':      'drew estate',
+
+  // Oliva
+  'oliva':            'oliva',
+  'serie v':          'oliva',
+  'serie o':          'oliva',
+  'serie g':          'oliva',
+  'melanio':          'oliva',
+  'cain':             'oliva',
+
+  // My Father
+  'my father':        'my father',
+  'le bijou':         'my father',
+  'flor de las antillas': 'my father',
+
+  // Rocky Patel
+  'rocky patel':      'rocky patel',
+  'rocky':            'rocky patel',
+
+  // Alec Bradley
+  'alec bradley':     'alec bradley',
+  'prensado':         'alec bradley',
+  'black market':     'alec bradley',
+
+  // Davidoff
+  'davidoff':         'davidoff',
+  'winston churchill':'davidoff',
+
+  // EP Carrillo
+  'ep carrillo':      'ep carrillo',
+  'e p carrillo':     'ep carrillo',
+  'carrillo':         'ep carrillo',
+
+  // La Flor Dominicana
+  'la flor dominicana': 'la flor dominicana',
+  'lfd':              'la flor dominicana',
+  'la flor':          'la flor dominicana',
+  'andalusian bull':  'la flor dominicana',
+
+  // Perdomo
+  'perdomo':          'perdomo',
+
+  // Camacho
+  'camacho':          'camacho',
+
+  // Ashton
+  'ashton':           'ashton',
+  'vsg':              'ashton',
+
+  // Plasencia
+  'plasencia':        'plasencia',
+  'alma fuerte':      'plasencia',
+  'alma del fuego':   'plasencia',
+
+  // Crowned Heads
+  'crowned heads':    'crowned heads',
+  'four kicks':       'crowned heads',
+  'mil dias':         'crowned heads',
+
+  // Joya de Nicaragua
+  'joya de nicaragua':'joya de nicaragua',
+  'joya':             'joya de nicaragua',
+  'antano':           'joya de nicaragua',
+  'antaño':           'joya de nicaragua',
+
+  // Tatuaje
+  'tatuaje':          'tatuaje',
+
+  // Foundation
+  'foundation':       'foundation',
+  'tabernacle':       'foundation',
+  'el gueguense':     'foundation',
+  'wise man':         'foundation',
+
+  // Illusione
+  'illusione':        'illusione',
+
+  // Cohiba
+  'cohiba':           'cohiba',
+
+  // Montecristo
+  'montecristo':      'montecristo',
+
+  // H. Upmann
+  'h upmann':         'h upmann',
+  'h. upmann':        'h upmann',
+  'upmann':           'h upmann',
+
+  // Romeo y Julieta
+  'romeo y julieta':  'romeo y julieta',
+  'romeo':            'romeo y julieta',
+
+  // Hoyo de Monterrey
+  'hoyo de monterrey':'hoyo de monterrey',
+  'hoyo':             'hoyo de monterrey',
+
+  // CAO
+  'cao':              'cao',
+  'flathead':         'cao',
+
+  // Room101
+  'room101':          'room101',
+  'room 101':         'room101',
+
+  // Warped
+  'warped':           'warped',
+
+  // Aganorsa
+  'aganorsa':         'aganorsa leaf',
+  'aganorsa leaf':    'aganorsa leaf',
+
+  // Diesel
+  'diesel':           'diesel',
+
+  // Macanudo
+  'macanudo':         'macanudo',
+
+  // Punch
+  'punch':            'punch',
+
+  // Aging Room
+  'aging room':       'aging room',
+  'quattro':          'aging room',
+
+  // Dunbarton
+  'dunbarton':        'dunbarton tobacco trust',
+  'sobremesa':        'dunbarton tobacco trust',
+  'umbagog':          'dunbarton tobacco trust',
+};
+
+// Build a reverse lookup: canonical brand token → true
+// so we can check if a query token matches any brand
+const CANONICAL_BRANDS = new Set(
+  ALL_CIGARS.map(c => normForExclusion(c.brand))
+);
+
+function queryMatchesCigar(queryToken, cigar) {
+  const brandNorm = normForExclusion(cigar.brand);
+  const nameNorm  = normForExclusion(cigar.name);
+  const t         = normForExclusion(queryToken);
+  if (t.length < 3) return false;
+
+  // Direct substring match (accent-stripped)
+  if (brandNorm.includes(t) || nameNorm.includes(t)) return true;
+
+  // Alias lookup → canonical brand comparison
+  const canonical = BRAND_ALIASES[t];
+  if (canonical) {
+    const canonicalBrand = normForExclusion(canonical);
+    if (brandNorm.includes(canonicalBrand) || canonicalBrand.includes(brandNorm)) return true;
+  }
+
+  return false;
+}
+
+// ---------------------------------------------------------------------------
 // Flavor synonym map — query terms → flavor note keywords in the data
 // ---------------------------------------------------------------------------
 const FLAVOR_SYNONYMS = {
@@ -487,17 +685,19 @@ exports.handler = async function (event) {
     const queryLower = norm(rawQuery);
     const tokens     = tokenize(rawQuery);
 
-    // Build a set of brand/name tokens to hard-exclude from results.
-    // This catches "like a Padron but cheaper" — individual tokens are checked
-    // against brand names so Padron never appears even in a longer query.
-    const queryTokens = tokens.concat([queryLower]).filter(Boolean);
+    // Build token list for fuzzy brand exclusion:
+    // includes individual words, bigrams, trigrams, and the full query
+    // so multi-word aliases like 'opus x', 'liga privada', 'my father' all match.
+    const rawWords = normForExclusion(rawQuery).split(' ').filter(Boolean);
+    const queryExclusionTokens = [
+      ...rawWords,
+      ...rawWords.slice(0,-1).map((w,i) => `${w} ${rawWords[i+1]}`),          // bigrams
+      ...rawWords.slice(0,-2).map((w,i) => `${w} ${rawWords[i+1]} ${rawWords[i+2]}`), // trigrams
+      normForExclusion(rawQuery),  // full query
+    ].filter(t => t.length > 2);
 
     function isQueryCigar(c) {
-      const brandLow = norm(c.brand);
-      const nameLow  = norm(c.name);
-      return queryTokens.some(t =>
-        t.length > 2 && (brandLow.includes(t) || nameLow.includes(t))
-      );
+      return queryExclusionTokens.some(t => queryMatchesCigar(t, c));
     }
 
     // Build candidate pool — exclude seen/disliked and any cigar named in the query
