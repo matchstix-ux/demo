@@ -193,6 +193,31 @@ const ALL_CIGARS = [
 
 
 // ---------------------------------------------------------------------------
+// Rate limiting — simple in-memory IP counter.
+// Netlify spins up multiple Lambda instances so this isn't perfect across
+// instances, but it stops runaway single-client abuse effectively.
+// Limit: 30 requests per IP per 60-second window.
+// ---------------------------------------------------------------------------
+
+const RATE_LIMIT_MAX      = 30;   // requests
+const RATE_LIMIT_WINDOW   = 60 * 1000; // 1 minute in ms
+const rateLimitMap = new Map(); // { ip -> { count, windowStart } }
+
+function isRateLimited(ip) {
+  const now  = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+
+  entry.count++;
+  if (entry.count > RATE_LIMIT_MAX) return true;
+  return false;
+}
+
+// ---------------------------------------------------------------------------
 // OpenAI — generate a "why this cigar?" explanation for each recommendation.
 // Falls back gracefully if the API key is absent or the call fails.
 // ---------------------------------------------------------------------------
@@ -387,6 +412,14 @@ exports.handler = async function (event) {
 
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers: CORS, body: "" };
   if (event.httpMethod !== "POST")    return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: "Method not allowed" }) };
+
+  // Rate limit check
+  const clientIp = event.headers?.['x-forwarded-for']?.split(',')[0].trim()
+                || event.headers?.['client-ip']
+                || 'unknown';
+  if (isRateLimited(clientIp)) {
+    return { statusCode: 429, headers: CORS, body: JSON.stringify({ error: "Too many requests — please wait a moment." }) };
+  }
 
   try {
     const body     = JSON.parse(event.body || "{}");

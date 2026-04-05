@@ -13,11 +13,26 @@ const clearBtn    = document.getElementById('clearBtn');
 // State
 // ---------------------------------------------------------------------------
 
+const STORAGE_KEY = 'matchsticks-liked';
+
+function loadLikedFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch { return new Set(); }
+}
+
+function saveLikedToStorage(likedSet) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...likedSet]));
+  } catch {}
+}
+
 const state = {
   currentQuery: '',
   currentResults: [],   // the 3 cards on screen
   buffer: [],           // extras returned by API, used for Replace
-  liked: new Set(),
+  liked: loadLikedFromStorage(),  // persisted across sessions
   disliked: new Set(),
   seen: new Set(),
   loading: false,
@@ -104,7 +119,13 @@ const EMPTY_STATE_HTML = `
   </div>`;
 
 function showEmptyState() {
-  resultsEl.innerHTML = EMPTY_STATE_HTML;
+  const likedCount = state.liked.size;
+  const memoryNote = likedCount > 0
+    ? `<p style="color:var(--accent-2);margin-top:8px;font-size:0.85rem">♥ ${likedCount} liked cigar${likedCount > 1 ? 's' : ''} remembered from your last session</p>`
+    : '';
+
+  resultsEl.innerHTML = EMPTY_STATE_HTML.replace('</div>\n  </div>', `${memoryNote}</div>\n  </div>`);
+
   // Wire hint chips
   resultsEl.querySelectorAll('.hint-chip').forEach(chip => {
     chip.addEventListener('click', () => {
@@ -238,6 +259,10 @@ async function fetchRecommendations(statusMsg) {
       signal: state.abortController.signal,
     });
 
+    if (res.status === 429) {
+      setStatus('Too many requests — please wait a moment.', { persistent: true });
+      return null;
+    }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error('Bad response format');
@@ -368,6 +393,7 @@ function handleLike(index) {
     state.disliked.delete(key);
     setStatus('Liked — future recs can lean this way.');
   }
+  saveLikedToStorage(state.liked);
   updateCardAt(index);
 }
 
@@ -379,6 +405,7 @@ function handleClear() {
   state.liked.clear();
   state.disliked.clear();
   state.seen.clear();
+  saveLikedToStorage(state.liked);
   queryInput.value = '';
   clearBtn.style.display = 'none';
   setStatus('');
