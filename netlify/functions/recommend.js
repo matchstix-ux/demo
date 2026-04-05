@@ -487,11 +487,24 @@ exports.handler = async function (event) {
     const queryLower = norm(rawQuery);
     const tokens     = tokenize(rawQuery);
 
-    // Build candidate pool — exclude seen/disliked and the searched cigar itself
+    // Build a set of brand/name tokens to hard-exclude from results.
+    // This catches "like a Padron but cheaper" — individual tokens are checked
+    // against brand names so Padron never appears even in a longer query.
+    const queryTokens = tokens.concat([queryLower]).filter(Boolean);
+
+    function isQueryCigar(c) {
+      const brandLow = norm(c.brand);
+      const nameLow  = norm(c.name);
+      return queryTokens.some(t =>
+        t.length > 2 && (brandLow.includes(t) || nameLow.includes(t))
+      );
+    }
+
+    // Build candidate pool — exclude seen/disliked and any cigar named in the query
     let pool = ALL_CIGARS.filter(c => {
       const key = getCigarKey(c);
       if (excluded.has(key)) return false;
-      if (queryLower && (norm(c.brand).includes(queryLower) || norm(c.name).includes(queryLower))) return false;
+      if (isQueryCigar(c)) return false;
       return true;
     });
 
@@ -514,7 +527,7 @@ exports.handler = async function (event) {
       const backup = shuffle(
         ALL_CIGARS.filter(c => {
           if (used.has(getCigarKey(c))) return false;
-          if (queryLower && (norm(c.brand).includes(queryLower) || norm(c.name).includes(queryLower))) return false;
+          if (isQueryCigar(c)) return false;
           return true;
         })
       );
