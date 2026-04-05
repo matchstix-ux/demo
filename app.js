@@ -114,7 +114,7 @@ const EMPTY_STATE_HTML = `
       <span class="hint-chip" data-query="creamy and smooth">Creamy &amp; Smooth</span>
       <span class="hint-chip" data-query="like a Padron but cheaper">Like Padron, cheaper</span>
       <span class="hint-chip" data-query="gift for someone who smokes Cohibas">Gift for a Cohiba smoker</span>
-      <span class="hint-chip" data-query="bourbon">Bourbon</span>
+      <span class="hint-chip" data-query="bourbon">Pairs with Bourbon</span>
       <span class="hint-chip" data-query="ribeye steak">Pairing: Ribeye</span>
       <span class="hint-chip" data-query="single malt scotch">Pairing: Scotch</span>
       <span class="hint-chip" data-query="espresso">Pairing: Espresso</span>
