@@ -222,7 +222,7 @@ function setLoading(v) {
   const submit = form.querySelector('button[type="submit"]');
   if (submit) {
     submit.disabled = v;
-    submit.textContent = v ? 'Finding…' : 'Get Recs';
+    submit.textContent = v ? 'AI thinking…' : 'Get Recs';
   }
   queryInput.disabled = v;
   syncButtons();
@@ -249,7 +249,7 @@ async function fetchRecommendations(statusMsg) {
   abortInflight();
   state.abortController = new AbortController();
   setLoading(true);
-  setStatus(statusMsg || 'Finding your recs…', { persistent: true });
+  setStatus(statusMsg || 'AI is selecting your best matches…', { persistent: true });
 
   try {
     const payload = {
@@ -323,7 +323,7 @@ async function handleSearch(e) {
   showEmptyState();
   clearBtn.style.display = 'inline-flex';
 
-  const all = await fetchRecommendations('Finding your recs…');
+  const all = await fetchRecommendations('AI is selecting your best matches…');
   if (!all || !all.length) {
     setStatus('No recommendations found — try a different search.', { persistent: true });
     return;
@@ -363,7 +363,7 @@ async function handleReplace(index) {
   }
 
   // Buffer exhausted — hit the API
-  const all = await fetchRecommendations('Finding a replacement…');
+  const all = await fetchRecommendations('Finding you a better match…');
   if (!all || !all.length) {
     setStatus('No more replacements found right now.', { persistent: true });
     return;

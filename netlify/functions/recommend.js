@@ -218,28 +218,52 @@ function isRateLimited(ip) {
 }
 
 // ---------------------------------------------------------------------------
-// OpenAI — generate a "why this cigar?" explanation for each recommendation.
-// Falls back gracefully if the API key is absent or the call fails.
+// OpenAI — true AI selection + explanation in a single call.
+//
+// Flow:
+//   1. Scoring engine pre-filters 184 cigars → top 20 candidates
+//   2. GPT receives all 20 + the raw user query
+//   3. GPT picks the best 6 (handles nuance the scorer can't)
+//   4. GPT writes a one-sentence "why" for each of those 6
+//   5. Returns { selected: [{index, why}, ...] } — we map back to cigars
+//
+// Falls back to scorer-only (top 6, no why) if API key absent or call fails.
 // ---------------------------------------------------------------------------
 
-async function generateWhyExplanations(query, cigars) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) return cigars.map(c => ({ ...c, why: null }));
+function strengthLabel(s) {
+  if (s <= 5) return 'mild';
+  if (s <= 7) return 'medium';
+  if (s <= 8) return 'full-bodied';
+  return 'extra full-bodied';
+}
 
-  // Build a compact cigar list for the prompt
-  const cigarList = cigars.map((c, i) =>
-    `${i + 1}. ${c.name} by ${c.brand} — ${c.strength <= 5 ? 'mild' : c.strength <= 7 ? 'medium' : 'full-bodied'}, ${c.priceRange}, notes: ${c.flavorNotes.join(', ')}`
+async function aiSelectAndExplain(query, candidates) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return { results: candidates.slice(0, 6).map(c => ({ ...c, why: null })), aiUsed: false };
+
+  const cigarList = candidates.map((c, i) =>
+    `${i}: ${c.name} by ${c.brand} | ${strengthLabel(c.strength)} | ${c.priceRange} | notes: ${c.flavorNotes.join(', ')}`
   ).join('\n');
 
-  const prompt = `You are a knowledgeable cigar sommelier. A customer searched for: "${query}"
+  const prompt = `You are an expert cigar sommelier at a premium retailer.
 
-You've selected these cigars for them:
+A customer searched for: "${query}"
+
+Here are ${candidates.length} pre-filtered candidates (index: name | strength | price | flavor notes):
 ${cigarList}
 
-For each cigar, write one concise sentence (max 20 words) explaining exactly WHY it matches this search. Be specific — mention the flavor connection, strength match, or value. Use second person ("You'll love...", "Perfect if...", "Matches your...").
+Your task:
+1. Select the 6 cigars that best match the customer's search. Consider the full intent — flavor mood, occasion cues ("after dinner", "on the golf course"), comparisons ("like a Padron but cheaper"), strength preferences, and price signals. Go beyond keyword matching.
+2. For each selected cigar, write ONE sentence (max 18 words) explaining why it matches. Be specific. Use second person.
 
-Respond with ONLY a JSON array of strings, one per cigar, in the same order. Example:
-["Matches your espresso craving with deep cocoa and a full body.", "Perfect if you want bold pepper without the price tag."]`;
+Rules:
+- You MUST return exactly 6 selections
+- Use the exact index numbers from the list above
+- Vary your selections — don't pick 6 similar cigars
+- If the query is vague, favor diversity of profile
+
+Respond with ONLY valid JSON in this exact shape (no markdown, no extra text):
+{"selected":[{"index":0,"why":"..."},{"index":3,"why":"..."}]}`;
 
   try {
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -250,32 +274,50 @@ Respond with ONLY a JSON array of strings, one per cigar, in the same order. Exa
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        temperature: 0.7,
-        max_tokens: 300,
+        temperature: 0.4,
+        max_tokens: 500,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
 
     if (!res.ok) {
       console.error('OpenAI error:', res.status, await res.text());
-      return cigars.map(c => ({ ...c, why: null }));
+      return { results: candidates.slice(0, 6).map(c => ({ ...c, why: null })), aiUsed: false };
     }
 
     const data = await res.json();
-    const raw = data.choices?.[0]?.message?.content?.trim() || '[]';
-
-    // Strip markdown code fences if present
+    const raw = data.choices?.[0]?.message?.content?.trim() || '{}';
     const cleaned = raw.replace(/^```json?\s*/i, '').replace(/\s*```$/, '').trim();
-    const explanations = JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned);
 
-    return cigars.map((c, i) => ({
-      ...c,
-      why: typeof explanations[i] === 'string' ? explanations[i] : null,
-    }));
+    if (!Array.isArray(parsed.selected) || parsed.selected.length === 0) {
+      throw new Error('Invalid response shape from GPT');
+    }
+
+    // Map GPT's index selections back to actual cigar objects
+    const results = parsed.selected
+      .filter(s => typeof s.index === 'number' && candidates[s.index])
+      .slice(0, 6)
+      .map(s => ({
+        ...candidates[s.index],
+        why: typeof s.why === 'string' ? s.why : null,
+      }));
+
+    // Pad to 6 if GPT returned fewer (shouldn't happen, but safe)
+    if (results.length < 6) {
+      const usedIndexes = new Set(parsed.selected.map(s => s.index));
+      const extras = candidates
+        .filter((_, i) => !usedIndexes.has(i))
+        .slice(0, 6 - results.length)
+        .map(c => ({ ...c, why: null }));
+      results.push(...extras);
+    }
+
+    return { results, aiUsed: true };
 
   } catch (err) {
-    console.error('OpenAI call failed:', err.message);
-    return cigars.map(c => ({ ...c, why: null }));
+    console.error('OpenAI selection failed:', err.message);
+    return { results: candidates.slice(0, 6).map(c => ({ ...c, why: null })), aiUsed: false };
   }
 }
 
@@ -439,7 +481,7 @@ exports.handler = async function (event) {
       return true;
     });
 
-    // Shuffle to randomise ties, then sort by score (descending)
+    // Shuffle first to randomise ties, then sort by score (descending)
     shuffle(pool);
 
     if (tokens.length > 0) {
@@ -449,11 +491,12 @@ exports.handler = async function (event) {
         .map(({ c }) => c);
     }
 
-    // Return 6 — client shows 3, buffers 3 for instant Replace without a re-fetch
-    let results = pool.slice(0, 6);
+    // Pre-filter to top 20 candidates for GPT — broad enough for nuance,
+    // small enough to keep tokens low and latency fast
+    let candidates = pool.slice(0, 20);
 
-    if (results.length < 3) {
-      const used = new Set(results.map(getCigarKey));
+    if (candidates.length < 6) {
+      const used = new Set(candidates.map(getCigarKey));
       const backup = shuffle(
         ALL_CIGARS.filter(c => {
           if (used.has(getCigarKey(c))) return false;
@@ -461,11 +504,12 @@ exports.handler = async function (event) {
           return true;
         })
       );
-      results = results.concat(backup).slice(0, 6);
+      candidates = candidates.concat(backup).slice(0, 20);
     }
 
-    // Generate AI "why" explanations for all candidates in one API call
-    results = await generateWhyExplanations(rawQuery || 'cigar recommendation', results);
+    // GPT selects the best 6 from the 20 candidates and writes a why for each.
+    // Falls back to top-6 scorer results with no why if AI is unavailable.
+    const { results } = await aiSelectAndExplain(rawQuery || 'cigar recommendation', candidates);
 
     return { statusCode: 200, headers: CORS, body: JSON.stringify(results) };
 
