@@ -237,7 +237,7 @@ function strengthLabel(s) {
   return 'extra full-bodied';
 }
 
-async function aiSelectAndExplain(query, candidates) {
+async function aiSelectAndExplain(query, candidates, options = {}) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return { results: candidates.slice(0, 6).map(c => ({ ...c, why: null })), aiUsed: false };
 
@@ -245,7 +245,37 @@ async function aiSelectAndExplain(query, candidates) {
     `${i}: ${c.name} by ${c.brand} | ${strengthLabel(c.strength)} | ${c.priceRange} | notes: ${c.flavorNotes.join(', ')}`
   ).join('\n');
 
-  const prompt = `You are an expert cigar sommelier at a premium retailer.
+  const isPairing = !!options.pairing;
+
+  const prompt = isPairing
+    ? `You are an expert cigar sommelier at a premium retailer.
+
+A customer wants to pair a cigar with: "${query}"
+
+Here are ${candidates.length} cigar candidates (index: name | strength | price | flavor notes):
+${cigarList}
+
+Your task:
+1. Select the 6 cigars that pair best with "${query}". Use your knowledge of classic pairing principles:
+   - Bourbon/whiskey: complement with vanilla, oak, leather, caramel; contrast with pepper and spice
+   - Espresso/coffee: echo with cocoa, chocolate, cream; avoid floral or citrus
+   - Steak/red meat: bold, full-bodied, earthy; match the richness
+   - Wine (red): tannic reds love full-bodied, spicy cigars; lighter reds prefer medium
+   - Beer (craft): IPAs pair with spice/pepper; stouts with chocolate/cream
+   - Scotch/single malt: peaty/smoky profiles love leather and earth
+   - Light spirits (gin, white rum): mild, floral, or citrus-forward cigars
+   - Seafood/light fare: mild, creamy, under strength 6
+2. For each selected cigar, write ONE sentence (max 18 words) explaining WHY it pairs with "${query}". Be specific about the flavor interaction. Use second person.
+
+Rules:
+- You MUST return exactly 6 selections
+- Use the exact index numbers from the list above
+- Vary the strength and price across selections
+- Explain the pairing chemistry, not just the cigar
+
+Respond with ONLY valid JSON in this exact shape (no markdown, no extra text):
+{"selected":[{"index":0,"why":"..."},{"index":3,"why":"..."}]}`
+    : `You are an expert cigar sommelier at a premium retailer.
 
 A customer searched for: "${query}"
 
@@ -509,7 +539,7 @@ exports.handler = async function (event) {
 
     // GPT selects the best 6 from the 20 candidates and writes a why for each.
     // Falls back to top-6 scorer results with no why if AI is unavailable.
-    const { results } = await aiSelectAndExplain(rawQuery || 'cigar recommendation', candidates);
+    const { results } = await aiSelectAndExplain(rawQuery || 'cigar recommendation', candidates, { pairing: !!body.pairing });
 
     return { statusCode: 200, headers: CORS, body: JSON.stringify(results) };
 
