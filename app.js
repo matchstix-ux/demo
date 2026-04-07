@@ -107,7 +107,7 @@ function setStatus(msg, { persistent = false } = {}) {
 const EMPTY_STATE_HTML = `
   <div class="empty-state">
     <div class="ember">🔥</div>
-    <p>AI Finds Your Next Favorite Smoke</p>
+    <p>Get Recs based on brands, flavors, food/drinks</p>
     <div class="hint-chips">
       <span class="hint-chip" data-query="spicy and full body">Spicy &amp; Full Body</span>
       <span class="hint-chip" data-query="creamy and smooth">Creamy &amp; Smooth</span>
