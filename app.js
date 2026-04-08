@@ -109,14 +109,14 @@ const EMPTY_STATE_HTML = `
     <div class="ember">🔥</div>
     <p>AI Finds Your Next Favorite Smoke</p>
     <div class="hint-chips">
-      <span class="hint-chip" data-query="spicy and full body">Spicy &amp; Full Body</span>
-      <span class="hint-chip" data-query="creamy and smooth">Creamy &amp; Smooth</span>
-      <span class="hint-chip" data-query="like a Padron but cheaper">Like Padron, cheaper</span>
-      <span class="hint-chip" data-query="gift for someone who smokes Cohibas">Gift for a Cohiba smoker</span>
-      <span class="hint-chip" data-query="bourbon">Pairs with Bourbon</span>
-      <span class="hint-chip" data-query="ribeye steak">Pairing: Ribeye</span>
-      <span class="hint-chip" data-query="single malt scotch">Pairing: Scotch</span>
-      <span class="hint-chip" data-query="espresso">Pairing: Espresso</span>
+      <button type="button" class="hint-chip" data-query="spicy and full body">Spicy &amp; Full Body</button>
+      <button type="button" class="hint-chip" data-query="creamy and smooth">Creamy &amp; Smooth</button>
+      <button type="button" class="hint-chip" data-query="like a Padron but cheaper">Like Padron, cheaper</button>
+      <button type="button" class="hint-chip" data-query="gift for someone who smokes Cohibas">Gift for a Cohiba smoker</button>
+      <button type="button" class="hint-chip" data-query="bourbon">Pairs with Bourbon</button>
+      <button type="button" class="hint-chip" data-query="ribeye steak">Pairing: Ribeye</button>
+      <button type="button" class="hint-chip" data-query="single malt scotch">Pairing: Scotch</button>
+      <button type="button" class="hint-chip" data-query="espresso">Pairing: Espresso</button>
     </div>
   </div>`;
 
@@ -153,17 +153,17 @@ function renderCigar(cigar, index) {
       <div class="card-brand">${escapeHtml(cigar.brand)}</div>
 
       <div class="card-meta">
-        ${price ? `<span class="price-badge">${price}</span>` : ''}
-        <span>${escapeHtml(label)}</span>
+        ${price ? `<span class="price-badge">${price}</button>` : ''}
+        <span>${escapeHtml(label)}</button>
       </div>
 
       <div class="strength-wrap">
-        <span>Mild</span>
+        <span>Mild</button>
         <div class="strength-track">
           <div class="strength-fill"
                style="width:${pct}%; background:${color}"></div>
         </div>
-        <span>Strong</span>
+        <span>Strong</button>
       </div>
 
       <div class="card-notes">
