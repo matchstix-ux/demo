@@ -327,7 +327,6 @@ async function handleSearch(e) {
   }
 
   resetForQuery(query);
-  if (!loadPicksFromUrl()) showEmptyState();
   clearBtn.style.display = 'inline-flex';
 
   const all = await fetchRecommendations('AI is finding your best matches…');
