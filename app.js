@@ -1,4 +1,4 @@
-// app.js — MatchSticks
+// app.js — Ask Arthur
 
 const API_PATH = '/.netlify/functions/recommend';
 const STATUS_AUTO_CLEAR_MS = 4000;
@@ -13,7 +13,7 @@ const clearBtn    = document.getElementById('clearBtn');
 // State
 // ---------------------------------------------------------------------------
 
-const STORAGE_KEY = 'matchsticks-liked';
+const STORAGE_KEY = 'askarthur-liked';
 
 function loadLikedFromStorage() {
   try {
