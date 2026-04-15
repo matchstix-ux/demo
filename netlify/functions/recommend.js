@@ -128,7 +128,7 @@ const ALL_CIGARS = [
   {"name":"Aganorsa Rare Leaf Reserve Robusto","brand":"Aganorsa Leaf","strength":6,"priceRange":"$10-$14","flavorNotes":["Earth","Cinnamon","Cocoa","Leather"]},
   {"name":"Crowned Heads Mil Dias Maduro Robusto","brand":"Crowned Heads","strength":6,"priceRange":"$12-$15","flavorNotes":["Cocoa","Nuts","Leather","Cream"]},
   {"name":"Kristoff Tres Compadres Toro","brand":"Kristoff","strength":5,"priceRange":"$10-$14","flavorNotes":["Cream","Bread","Wood","Nuts","Pepper"]},
-  {"name":"Hoyo de Monterrey Double Corona","brand":"Hoyo de Monterrey","strength":7,"priceRange":"$9-$13","flavorNotes":["Earth","Cedar","Spice","Leather"]},
+  {"name":"Hoyo de Monterrey Double Corona","brand":"Hoyo de Monterrey","strength":5,"priceRange":"$9-$13","flavorNotes":["Cream","Cedar","Nuts","Earth"]},
   {"name":"Oliva Cain F Lancero","brand":"Oliva","strength":9,"priceRange":"$9-$13","flavorNotes":["Coffee","Pepper","Wood","Earth"]},
   {"name":"Arturo Fuente Don Carlos Robusto","brand":"Arturo Fuente","strength":7,"priceRange":"$16-$22","flavorNotes":["Cedar","Almonds","Cream","Spice","Earth"]},
   {"name":"Aging Room Quattro Nicaragua Maestro","brand":"Aging Room","strength":7,"priceRange":"$11-$15","flavorNotes":["Dark Chocolate","Spice","Earth","Coffee"]},
@@ -145,7 +145,7 @@ const ALL_CIGARS = [
   {"name":"Crowned Heads La Vereda Robusto","brand":"Crowned Heads","strength":6,"priceRange":"$9-$12","flavorNotes":["Cedar","Sweetness","Cream","Spice"]},
   {"name":"Davidoff Aniversario Special R","brand":"Davidoff","strength":6,"priceRange":"$28-$35","flavorNotes":["Cedar","Floral","Cream","Nuts"]},
   {"name":"Ashton VSG Torpedo","brand":"Ashton","strength":9,"priceRange":"$18-$24","flavorNotes":["Pepper","Earth","Wood","Spice","Leather"]},
-  {"name":"Acid Blue Kuba Kuba","brand":"Drew Estate","strength":5,"priceRange":"$9-$12","flavorNotes":["Floral","Sweetness","Spice","Cream"]},
+  {"name":"Acid Blue Kuba Kuba","brand":"Drew Estate","strength":3,"priceRange":"$9-$12","flavorNotes":["Floral","Sweetness","Spice","Cream"]},
   {"name":"General Cigar Macanudo Inspirado Black Toro","brand":"Macanudo","strength":8,"priceRange":"$9-$12","flavorNotes":["Earth","Pepper","Leather","Spice"]},
   {"name":"Oliva Master Blends 3 Robusto","brand":"Oliva","strength":7,"priceRange":"$9-$12","flavorNotes":["Cedar","Spice","Coffee","Earth"]},
   {"name":"My Father Flor de las Antillas Toro","brand":"My Father","strength":7,"priceRange":"$8-$11","flavorNotes":["Cedar","Sweetness","Cream","Spice"]},
@@ -225,7 +225,7 @@ const ALL_CIGARS = [
   {"name":"La Gloria Cubana Gilded Age Gordo","brand":"La Gloria Cubana","strength":7,"priceRange":"$12-$16","flavorNotes":["Earth","Cedar","Spice","Cream","Leather"]},
   {"name":"Asylum Lobotomy Corojo Double Toro","brand":"Asylum","strength":8,"priceRange":"$7-$10","flavorNotes":["Pepper","Earth","Spice","Dark Chocolate","Leather"]},
   {"name":"AJ Fernandez New World Dorado Toro","brand":"AJ Fernandez","strength":7,"priceRange":"$9-$13","flavorNotes":["Earth","Sweetness","Spice","Leather","Cedar"]},
-  {"name":"Tabak Especial Dulce Toro","brand":"Drew Estate","strength":5,"priceRange":"$8-$11","flavorNotes":["Espresso","Cream","Chocolate","Sweetness"]},
+  {"name":"Tabak Especial Dulce Toro","brand":"Drew Estate","strength":3,"priceRange":"$8-$11","flavorNotes":["Espresso","Cream","Chocolate","Sweetness"]},
   {"name":"Kentucky Fire Cured Robusto","brand":"Drew Estate","strength":8,"priceRange":"$8-$12","flavorNotes":["Smoke","Earth","Leather","Pepper","Dark Chocolate"]},
   {"name":"Perdomo Habano Bourbon Barrel-Aged Maduro Toro","brand":"Perdomo","strength":7,"priceRange":"$9-$13","flavorNotes":["Dark Chocolate","Coffee","Earth","Sweetness","Leather"]},
   {"name":"Davidoff Nicaragua Robusto","brand":"Davidoff","strength":7,"priceRange":"$18-$24","flavorNotes":["Pepper","Coffee","Chocolate","Spice","Cream"]},
@@ -255,7 +255,38 @@ const ALL_CIGARS = [
   {"name":"Crowned Heads Le Patite Debutante Robusto","brand":"Crowned Heads","strength":5,"priceRange":"$11-$15","flavorNotes":["Cream","Cedar","Floral","Nuts","Sweetness"]},
   {"name":"Brick House Mighty Mighty Gordo","brand":"Brick House","strength":7,"priceRange":"$7-$10","flavorNotes":["Earth","Leather","Cedar","Spice","Coffee"]},
   {"name":"Diesel Whiskey Row Robusto","brand":"Diesel","strength":7,"priceRange":"$8-$12","flavorNotes":["Oak","Sweetness","Vanilla","Spice","Earth"]},
-  {"name":"Diesel Hair of the Dog Robusto","brand":"Diesel","strength":8,"priceRange":"$9-$13","flavorNotes":["Pepper","Earth","Dark Chocolate","Leather","Spice"]}
+  {"name":"Diesel Hair of the Dog Robusto","brand":"Diesel","strength":8,"priceRange":"$9-$13","flavorNotes":["Pepper","Earth","Dark Chocolate","Leather","Spice"]},
+  {"name":"Macanudo Cafe Hyde Park","brand":"Macanudo","strength":2,"priceRange":"$5-$8","flavorNotes":["Cream","Cedar","Nuts","Sweetness"]},
+  {"name":"Macanudo Cafe Hampton Court","brand":"Macanudo","strength":2,"priceRange":"$6-$9","flavorNotes":["Cream","Cedar","Floral","Nuts"]},
+  {"name":"Macanudo Cafe Duke of Devon","brand":"Macanudo","strength":1,"priceRange":"$5-$7","flavorNotes":["Cream","Sweetness","Floral","Cedar"]},
+  {"name":"Macanudo Cafe Portofino","brand":"Macanudo","strength":2,"priceRange":"$5-$8","flavorNotes":["Cream","Nuts","Cedar","Honey"]},
+  {"name":"Ashton Classic Corona","brand":"Ashton","strength":2,"priceRange":"$7-$10","flavorNotes":["Cream","Cedar","Nuts","Sweetness"]},
+  {"name":"Ashton Classic Double Magnum","brand":"Ashton","strength":2,"priceRange":"$9-$13","flavorNotes":["Cream","Cedar","Honey","Nuts"]},
+  {"name":"Davidoff Grand Cru No. 1","brand":"Davidoff","strength":2,"priceRange":"$18-$24","flavorNotes":["Cream","Cedar","Nuts","Floral"]},
+  {"name":"Romeo y Julieta 1875 Corona","brand":"Romeo y Julieta","strength":2,"priceRange":"$5-$8","flavorNotes":["Cream","Cedar","Sweetness","Nuts"]},
+  {"name":"Romeo y Julieta Reserva Real Connecticut","brand":"Romeo y Julieta","strength":2,"priceRange":"$7-$10","flavorNotes":["Cream","Honey","Cedar","Floral"]},
+  {"name":"Montecristo White Series Rothschilde","brand":"Montecristo","strength":3,"priceRange":"$8-$12","flavorNotes":["Cream","Cedar","Nuts","Sweetness"]},
+  {"name":"H. Upmann 1844 Connecticut Robusto","brand":"H. Upmann","strength":2,"priceRange":"$6-$9","flavorNotes":["Cream","Cedar","Nuts","Honey"]},
+  {"name":"H. Upmann Banker Acquisition Robusto","brand":"H. Upmann","strength":3,"priceRange":"$9-$13","flavorNotes":["Cream","Cedar","Sweetness","Floral"]},
+  {"name":"Arturo Fuente Brevas Royale","brand":"Arturo Fuente","strength":2,"priceRange":"$5-$8","flavorNotes":["Cream","Cedar","Nuts","Sweetness"]},
+  {"name":"Hoyo de Monterrey Excalibur No. 1","brand":"Hoyo de Monterrey","strength":2,"priceRange":"$7-$11","flavorNotes":["Cream","Cedar","Floral","Sweetness"]},
+  {"name":"Hoyo de Monterrey Rothschild","brand":"Hoyo de Monterrey","strength":2,"priceRange":"$5-$8","flavorNotes":["Cream","Cedar","Nuts","Honey"]},
+  {"name":"Nub Connecticut Robusto","brand":"Nub","strength":3,"priceRange":"$7-$10","flavorNotes":["Cream","Cedar","Nuts","Sweetness"]},
+  {"name":"Perdomo Connecticut Robusto","brand":"Perdomo","strength":3,"priceRange":"$6-$9","flavorNotes":["Cream","Cedar","Honey","Nuts"]},
+  {"name":"CAO Connecticut Robusto","brand":"CAO","strength":3,"priceRange":"$6-$9","flavorNotes":["Cream","Nuts","Cedar","Sweetness"]},
+  {"name":"Oliva Connecticut Reserve Robusto","brand":"Oliva","strength":3,"priceRange":"$7-$10","flavorNotes":["Cream","Cedar","Honey","Nuts"]},
+  {"name":"Davidoff Aniversario No. 3","brand":"Davidoff","strength":4,"priceRange":"$22-$28","flavorNotes":["Cream","Cedar","Nuts","Honey"]},
+  {"name":"Ashton VSG Wizard","brand":"Ashton","strength":5,"priceRange":"$20-$26","flavorNotes":["Cream","Cedar","Spice","Earth"]},
+  {"name":"Arturo Fuente Don Carlos No. 3","brand":"Arturo Fuente","strength":5,"priceRange":"$18-$24","flavorNotes":["Cedar","Sweetness","Cream","Nuts"]},
+  {"name":"Montecristo Platinum Toro","brand":"Montecristo","strength":5,"priceRange":"$18-$24","flavorNotes":["Cedar","Nuts","Cream","Earth"]},
+  {"name":"Romeo y Julieta Vintage No. 5","brand":"Romeo y Julieta","strength":4,"priceRange":"$18-$24","flavorNotes":["Cream","Cedar","Floral","Sweetness"]},
+  {"name":"H. Upmann Magnum 54","brand":"H. Upmann","strength":4,"priceRange":"$20-$26","flavorNotes":["Cream","Cedar","Nuts","Honey"]},
+  {"name":"Perdomo Habano Champagne Epicure","brand":"Perdomo","strength":4,"priceRange":"$8-$12","flavorNotes":["Cream","Honey","Cedar","Floral"]},
+  {"name":"Oliva Serie G Maduro Torpedo","brand":"Oliva","strength":5,"priceRange":"$7-$10","flavorNotes":["Chocolate","Cedar","Cream","Sweetness"]},
+  {"name":"Rocky Patel Vintage 1999 Toro","brand":"Rocky Patel","strength":5,"priceRange":"$10-$14","flavorNotes":["Cedar","Cream","Nuts","Earth"]},
+  {"name":"Cohiba Blue Robusto","brand":"Cohiba","strength":5,"priceRange":"$18-$24","flavorNotes":["Cream","Cedar","Spice","Earth"]},
+  {"name":"CAO Cameroon Churchill","brand":"CAO","strength":4,"priceRange":"$8-$12","flavorNotes":["Sweetness","Cedar","Nuts","Cream"]},
+  {"name":"Alec Bradley American Classic Robusto","brand":"Alec Bradley","strength":4,"priceRange":"$7-$10","flavorNotes":["Cream","Cedar","Nuts","Sweetness"]}
 ];
 
 
@@ -300,15 +331,23 @@ function isRateLimited(ip) {
 // ---------------------------------------------------------------------------
 
 function strengthLabel(s) {
-  if (s <= 5) return 'mild';
-  if (s <= 7) return 'medium';
-  if (s <= 8) return 'full-bodied';
-  return 'extra full-bodied';
+  if (s <= 3) return 'mild';
+  if (s <= 5) return 'medium';
+  if (s <= 8) return 'medium-full';
+  return 'full';
+}
+
+function synthesizeWhy(c) {
+  const notes = (c.flavorNotes || []).slice(0, 2).join(' and ');
+  const strength = strengthLabel(c.strength).toLowerCase();
+  return notes
+    ? `Its ${notes} profile makes it a natural fit for what you're after.`
+    : `A ${strength} smoke that matches your request well.`;
 }
 
 async function aiSelectAndExplain(query, candidates) {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) return { results: candidates.slice(0, 6).map(c => ({ ...c, why: null })), aiUsed: false };
+  if (!apiKey) return { results: candidates.slice(0, 6).map(c => ({ ...c, why: synthesizeWhy(c) })), aiUsed: false };
 
   const cigarList = candidates.map((c, i) =>
     `${i}: ${c.name} by ${c.brand} | ${strengthLabel(c.strength)} | ${c.priceRange} | notes: ${c.flavorNotes.join(', ')}`
@@ -322,6 +361,21 @@ First, read the intent:
 - If the query describes a food or drink (bourbon, espresso, steak, red wine, scotch, IPA, coffee, etc.) — treat this as a PAIRING request. Select cigars that complement or contrast the flavors of that item using classic pairing principles.
 - If the query describes a cigar, brand, flavor profile, occasion, or preference (spicy, full body, like a Padron, after dinner smoke, gift for someone, etc.) — treat this as a PREFERENCE request. Select cigars that best match that taste or need.
 - If it's both (e.g. "bourbon and spicy") — honor both signals.
+
+Brand profile rules (CRITICAL — treat brand mentions as strength/flavor cues, not just name filters):
+Strength scale: 1–3 = mild | 4–5 = medium | 6–8 = medium-full | 9–10 = full
+- Macanudo: Cafe line → mild (1–3). Inspirado line → medium-full (6–8). If query says only "Macanudo" with no line specified, default to mild (Cafe line profile).
+- Hoyo de Monterrey → mild (1–3). ONLY recommend mild cigars.
+- Ashton, Davidoff → mild to medium (1–4).
+- Romeo y Julieta, H. Upmann, Arturo Fuente → medium (3–5).
+- Montecristo, Cohiba → medium (4–5).
+- Oliva → medium to medium-full (5–7).
+- Padron, Liga Privada/Drew Estate → medium-full to full (6–9).
+- Opus X (Fuente OpusX) → full (8–10). NEVER recommend Opus X for a medium-bodied request.
+When the query names a brand, never go outside that brand's implied strength range.
+Dry-cured / machine-made cigar rule (CRITICAL): Villiger Export, Café Crème, Toscano, Parodi, Dannemann, and Al Capone are dry-cured machine-made cigars with a completely different character from premium hand-rolled long-filler cigars. They have hay, dried fruit, and tobacco-forward profiles. When the user names any of these brands or the word "dry-cured" appears, recommend ONLY other dry-cured or machine-made cigars of similar style. NEVER recommend premium long-fillers like Padron, Liga Privada, My Father, Oliva, etc. in response to a dry-cured query.
+
+Luxury/premium rule (CRITICAL): Premium, luxury, gift, impressive, and special occasion do NOT mean stronger or bolder. Luxury is about craftsmanship, price, and presentation — not body. A Davidoff Grand Cru ($20+, strength 2) is one of the most premium cigars in the world and is mild. A Dunbarton Sobremesa Brulée, Ashton Classic, or Perdomo Champagne are all gift-worthy luxury cigars that are mild to medium. Never use prestige or occasion framing as a signal to go fuller-bodied. When a gift or special occasion is mentioned without a brand, prioritize well-crafted, higher-priced options across ALL strength levels — let the customer's flavor or brand preference drive strength, not the occasion. When a brand IS mentioned, the brand's strength profile is absolute regardless of occasion words.
 
 Pairing principles to apply when relevant:
 - Bourbon/whiskey → oak, leather, vanilla, caramel notes complement; pepper and spice contrast nicely
@@ -337,16 +391,17 @@ ${cigarList}
 
 Your task:
 1. Select the 6 cigars that best serve the customer's intent
-2. For each, write ONE sentence (max 18 words) explaining why. Be specific — mention the flavor connection, pairing chemistry, or profile match. Use second person.
+2. For EVERY selected cigar, write ONE sentence (max 18 words) explaining why. Be specific — mention the flavor connection, pairing chemistry, or profile match. Use second person.
 
 Rules:
 - Exactly 6 selections
 - Use the exact index numbers above
-- Vary strength and price across selections
+- Vary strength and price across selections, BUT respect any explicit price constraint in the query (e.g. "under $10", "between $10 and $20", "over $20") — prioritize candidates in that range
 - Never explain what the cigar tastes like in isolation — always connect it to what the customer asked for
+- The "why" field is REQUIRED for every entry — never omit it or leave it empty
 
 Respond with ONLY valid JSON, no markdown:
-{"selected":[{"index":0,"why":"..."},{"index":3,"why":"..."}]}`;
+{"selected":[{"index":0,"why":"Arthur picked this because..."},{"index":3,"why":"Arthur picked this because..."}]}`;
 
   try {
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -365,7 +420,7 @@ Respond with ONLY valid JSON, no markdown:
 
     if (!res.ok) {
       console.error('OpenAI error:', res.status, await res.text());
-      return { results: candidates.slice(0, 6).map(c => ({ ...c, why: null })), aiUsed: false };
+      return { results: candidates.slice(0, 6).map(c => ({ ...c, why: synthesizeWhy(c) })), aiUsed: false };
     }
 
     const data = await res.json();
@@ -383,7 +438,7 @@ Respond with ONLY valid JSON, no markdown:
       .slice(0, 6)
       .map(s => ({
         ...candidates[s.index],
-        why: typeof s.why === 'string' ? s.why : null,
+        why: (typeof s.why === 'string' && s.why.trim()) ? s.why.trim() : null,
       }));
 
     // Pad to 6 if GPT returned fewer (shouldn't happen, but safe)
@@ -396,11 +451,14 @@ Respond with ONLY valid JSON, no markdown:
       results.push(...extras);
     }
 
+    // Guarantee every result has a why — synthesize from cigar data as last resort
+    results.forEach(c => { if (!c.why) c.why = synthesizeWhy(c); });
+
     return { results, aiUsed: true };
 
   } catch (err) {
     console.error('OpenAI selection failed:', err.message);
-    return { results: candidates.slice(0, 6).map(c => ({ ...c, why: null })), aiUsed: false };
+    return { results: candidates.slice(0, 6).map(c => ({ ...c, why: synthesizeWhy(c) })), aiUsed: false };
   }
 }
 
@@ -575,6 +633,16 @@ const BRAND_ALIASES = {
   'dunbarton':        'dunbarton tobacco trust',
   'sobremesa':        'dunbarton tobacco trust',
   'umbagog':          'dunbarton tobacco trust',
+
+  // Dry-cured / machine-made
+  'villiger export':  'villiger',
+  'villiger export natural': 'villiger',
+  'villiger export maduro': 'villiger',
+  'villiger export brasil': 'villiger',
+  'villiger export sumatra': 'villiger',
+  'cafe creme':       'café crème',
+  'café creme':       'café crème',
+  'cafe crème':       'café crème',
 };
 
 // Build a reverse lookup: canonical brand token → true
@@ -640,11 +708,70 @@ const FLAVOR_SYNONYMS = {
 
 // Strength keywords → [min, max] on the 4–10 scale
 const STRENGTH_KEYWORDS = {
-  "full body": [8, 10], "full-bodied": [8, 10], fullbodied: [8, 10],
-  full: [8, 10], strong: [8, 10],
-  "medium full": [6, 8], "medium-full": [6, 8],
-  medium: [5, 7], "medium body": [5, 7], "medium-bodied": [5, 7],
-  mild: [4, 5], mellow: [4, 5], light: [4, 5],
+  full: [9, 10], "full body": [9, 10], "full-bodied": [9, 10], fullbodied: [9, 10], strong: [9, 10],
+  "medium full": [6, 8], "medium-full": [6, 8], "medium full body": [6, 8],
+  medium: [4, 5], "medium body": [4, 5], "medium-bodied": [4, 5], "medium bodied": [4, 5],
+  "full bodied": [9, 10], "full body": [9, 10],
+  mild: [1, 3], mellow: [1, 3], light: [1, 3], creamy: [1, 3],
+};
+
+// Brand → implied strength profile
+// When a user mentions a brand by name, we treat it as a profile cue
+// (e.g. "like a Macanudo" means mild/creamy, not medium/full)
+const BRAND_STRENGTH_PROFILES = {
+  'macanudo':           { strengthRange: [1, 3], flavorBoost: ['cream', 'cedar', 'nuts', 'sweetness'] },
+  'hoyo de monterrey':  { strengthRange: [1, 3], flavorBoost: ['cream', 'cedar', 'floral'] },
+  'ashton':             { strengthRange: [1, 9], flavorBoost: ['cream', 'cedar', 'nuts'] },  // Classic=mild, VSG=full
+  'davidoff':           { strengthRange: [1, 7], flavorBoost: ['cream', 'cedar', 'nuts'] },  // Grand Cru=mild, Nicaragua=med-full
+  'romeo y julieta':    { strengthRange: [2, 6], flavorBoost: ['cedar', 'sweetness', 'nuts'] },  // 1875=mild, Nicaragua=med-full
+  'romeo':              { strengthRange: [2, 6], flavorBoost: ['cedar', 'sweetness', 'nuts'] },
+  'h upmann':           { strengthRange: [2, 6], flavorBoost: ['cream', 'cedar', 'nuts'] },     // 1844=mild, AJ Fernandez=med-full
+  'arturo fuente':      { strengthRange: [2, 7], flavorBoost: ['cedar', 'sweetness', 'spice'] }, // Brevas=mild, Hemingway=med-full
+  'opus x':             { strengthRange: [8, 10], flavorBoost: ['pepper', 'leather', 'earth', 'coffee'] },
+  'opusx':              { strengthRange: [8, 10], flavorBoost: ['pepper', 'leather', 'earth', 'coffee'] },
+  'montecristo':        { strengthRange: [4, 5], flavorBoost: ['cedar', 'nuts', 'earth'] },
+  'cohiba':             { strengthRange: [4, 6], flavorBoost: ['cedar', 'spice', 'earth'] },
+  'oliva':              { strengthRange: [5, 7], flavorBoost: ['cedar', 'spice', 'chocolate'] },
+  'padron':             { strengthRange: [6, 8], flavorBoost: ['cocoa', 'espresso', 'earth'] },
+  'drew estate':        { strengthRange: [6, 9], flavorBoost: ['coffee', 'cocoa', 'spice'] },
+  'dunbarton':          { strengthRange: [4, 8], flavorBoost: ['cream', 'sweetness', 'cedar'] },
+  'dunbarton tobacco':  { strengthRange: [4, 8], flavorBoost: ['cream', 'sweetness', 'cedar'] },
+  'sobremesa':          { strengthRange: [4, 5], flavorBoost: ['cream', 'sweetness', 'cedar'] },
+  'perdomo':            { strengthRange: [3, 7], flavorBoost: ['cream', 'cedar', 'honey', 'spice'] },
+  'avo':                { strengthRange: [2, 5], flavorBoost: ['cream', 'cedar', 'nuts', 'sweetness'] },
+  'nub':                { strengthRange: [3, 5], flavorBoost: ['cream', 'cedar', 'nuts'] },
+  'warped':             { strengthRange: [4, 6], flavorBoost: ['cream', 'bread', 'nuts', 'cedar'] },
+  'rocky patel':        { strengthRange: [5, 8], flavorBoost: ['cedar', 'spice', 'nuts', 'cream'] },
+  'alec bradley':       { strengthRange: [5, 7], flavorBoost: ['leather', 'cocoa', 'pepper', 'cedar'] },
+  'camacho':            { strengthRange: [6, 8], flavorBoost: ['spice', 'leather', 'earth'] },
+  'my father':          { strengthRange: [6, 9], flavorBoost: ['pepper', 'espresso', 'cocoa', 'earth'] },
+  'la flor dominicana': { strengthRange: [7, 10], flavorBoost: ['spice', 'earth', 'pepper', 'chocolate'] },
+  'joya de nicaragua':  { strengthRange: [6, 9], flavorBoost: ['pepper', 'earth', 'leather'] },
+  'diesel':             { strengthRange: [7, 9], flavorBoost: ['earth', 'spice', 'leather'] },
+  'foundation':         { strengthRange: [5, 8], flavorBoost: ['earth', 'cocoa', 'spice', 'nuts'] },
+  'crowned heads':      { strengthRange: [5, 7], flavorBoost: ['cedar', 'sweetness', 'cream', 'spice'] },
+  'ep carrillo':        { strengthRange: [5, 7], flavorBoost: ['caramel', 'cedar', 'earth', 'cream'] },
+  'tatuaje':            { strengthRange: [6, 8], flavorBoost: ['pepper', 'cedar', 'earth', 'chocolate'] },
+  'plasencia':          { strengthRange: [7, 9], flavorBoost: ['earth', 'pepper', 'chocolate', 'coffee'] },
+  'aganorsa':           { strengthRange: [6, 8], flavorBoost: ['cream', 'cedar', 'spice', 'pepper'] },
+  'illusione':          { strengthRange: [5, 8], flavorBoost: ['coffee', 'cedar', 'sweetness', 'pepper'] },
+  'cao':                { strengthRange: [4, 7], flavorBoost: ['chocolate', 'espresso', 'cedar', 'nuts'] },
+  'aging room':         { strengthRange: [5, 7], flavorBoost: ['chocolate', 'coffee', 'pepper', 'cedar'] },
+  'southern draw':      { strengthRange: [5, 7], flavorBoost: ['cedar', 'sweetness', 'spice'] },
+  'san cristobal':      { strengthRange: [5, 7], flavorBoost: ['cocoa', 'leather', 'spice'] },
+  'punch':              { strengthRange: [6, 8], flavorBoost: ['spice', 'earth', 'cedar'] },
+  'brick house':        { strengthRange: [6, 7], flavorBoost: ['wood', 'leather', 'nuts', 'coffee'] },
+  'la aroma de cuba':   { strengthRange: [5, 7], flavorBoost: ['cocoa', 'espresso', 'earth'] },
+  'herrera esteli':     { strengthRange: [7, 9], flavorBoost: ['dark chocolate', 'espresso', 'earth', 'spice'] },
+  'espinosa':           { strengthRange: [5, 7], flavorBoost: ['spice', 'earth', 'cedar'] },
+  // Dry-cured / machine-made brands
+  'villiger':           { strengthRange: [2, 5], flavorBoost: ['hay', 'dried fruit', 'tobacco', 'sweetness'], style: 'dry-cured' },
+  'toscano':            { strengthRange: [5, 7], flavorBoost: ['earth', 'dried fruit', 'tobacco', 'hay'], style: 'dry-cured' },
+  'parodi':             { strengthRange: [5, 7], flavorBoost: ['earth', 'tobacco', 'dried fruit'], style: 'dry-cured' },
+  'dannemann':          { strengthRange: [2, 4], flavorBoost: ['hay', 'sweetness', 'cream', 'tobacco'], style: 'dry-cured' },
+  'cafe creme':         { strengthRange: [1, 3], flavorBoost: ['cream', 'sweetness', 'hay', 'tobacco'], style: 'dry-cured' },
+  'café crème':         { strengthRange: [1, 3], flavorBoost: ['cream', 'sweetness', 'hay', 'tobacco'], style: 'dry-cured' },
+  'al capone':          { strengthRange: [1, 3], flavorBoost: ['sweetness', 'cream', 'vanilla', 'tobacco'], style: 'dry-cured' },
 };
 
 // Price keywords → price-range lower-bound band
@@ -677,6 +804,43 @@ function getCigarKey(cigar) {
   return `${norm(cigar.brand)}::${norm(cigar.name)}`;
 }
 
+// Sub-line overrides: when a specific product line is named, it takes priority
+// over the parent brand's default profile. Keyed by the sub-line token.
+const SUBLINE_OVERRIDES = {
+  'inspirado':  { strengthRange: [6, 8], flavorBoost: ['pepper', 'earth', 'spice', 'leather'] }, // Macanudo Inspirado
+  'inspirado black': { strengthRange: [7, 9], flavorBoost: ['pepper', 'earth', 'dark chocolate', 'spice'] },
+  'inspirado orange': { strengthRange: [6, 7], flavorBoost: ['spice', 'earth', 'cedar', 'pepper'] },
+  'vsg':        { strengthRange: [7, 9], flavorBoost: ['pepper', 'cedar', 'earth', 'spice'] }, // Ashton VSG
+  'liga privada': { strengthRange: [7, 9], flavorBoost: ['coffee', 'cocoa', 'spice', 'earth'] },
+  'serie v':    { strengthRange: [6, 8], flavorBoost: ['cedar', 'spice', 'chocolate', 'earth'] }, // Oliva Serie V
+};
+
+// Detect which brand profiles are implied by the query tokens
+function getBrandProfiles(tokens) {
+  // Check for sub-line overrides first — these take priority over brand-level defaults
+  for (const token of tokens) {
+    if (SUBLINE_OVERRIDES[token]) return [SUBLINE_OVERRIDES[token]];
+  }
+  // Check bigrams for multi-word sub-lines
+  const tokenStr = tokens.join(' ');
+  for (const [key, profile] of Object.entries(SUBLINE_OVERRIDES)) {
+    if (key.includes(' ') && tokenStr.includes(key)) return [profile];
+  }
+
+  const profiles = [];
+  for (const token of tokens) {
+    // Direct match
+    if (BRAND_STRENGTH_PROFILES[token]) { profiles.push(BRAND_STRENGTH_PROFILES[token]); continue; }
+    // Via alias → canonical
+    const canonical = BRAND_ALIASES[token];
+    if (canonical) {
+      const canonKey = norm(canonical);
+      if (BRAND_STRENGTH_PROFILES[canonKey]) profiles.push(BRAND_STRENGTH_PROFILES[canonKey]);
+    }
+  }
+  return profiles;
+}
+
 function scoreCigar(cigar, tokens) {
   let score = 0;
   const notes    = cigar.flavorNotes.map(n => n.toLowerCase());
@@ -684,6 +848,33 @@ function scoreCigar(cigar, tokens) {
   const nameLow  = norm(cigar.name);
   const strength = cigar.strength;
   const priceLow = parsePriceLow(cigar.priceRange);
+
+  // Apply implied brand profile boosts/penalties
+  // These are strong signals — brand mention overrides generic occasion/price words
+  const brandProfiles = getBrandProfiles(tokens);
+  const isDryCuredQuery = brandProfiles.some(p => p.style === 'dry-cured');
+  for (const profile of brandProfiles) {
+    const [sMin, sMax] = profile.strengthRange;
+    if (strength >= sMin && strength <= sMax) {
+      score += 25; // strongly reward cigars in the same strength band
+    } else {
+      score -= 30; // hard penalise cigars outside the implied strength range
+    }
+    for (const flavorTarget of profile.flavorBoost) {
+      if (notes.includes(flavorTarget)) score += 4;
+    }
+  }
+
+  // Dry-cured style matching: when a dry-cured brand is named, heavily boost
+  // other dry-cured cigars and penalise premium long-filler cigars.
+  // This prevents Villiger Export queries from returning Padrons and Ligas.
+  if (isDryCuredQuery) {
+    if (cigar.style === 'dry-cured') {
+      score += 30; // strongly prefer dry-cured siblings
+    } else {
+      score -= 25; // penalise premium long-filler cigars
+    }
+  }
 
   for (const token of tokens) {
     if (brandLow.includes(token) || nameLow.includes(token)) { score += 10; continue; }
@@ -797,9 +988,23 @@ exports.handler = async function (event) {
       return true;
     });
 
+    // Detect explicit price constraint in query (e.g. from price chip: "under $10", "between $10 and $20", "over $20")
+    let priceConstraint = null;
+    if (/under\s*\$?10|price.*under.*10/i.test(rawQuery))      priceConstraint = c => parsePriceLow(c.priceRange) < 10;
+    else if (/between\s*\$?10.*\$?20|10.*and.*20|\$10.*\$20/i.test(rawQuery)) priceConstraint = c => { const p = parsePriceLow(c.priceRange); return p >= 10 && p <= 20; };
+    else if (/over\s*\$?20|above\s*\$?20/i.test(rawQuery))    priceConstraint = c => parsePriceLow(c.priceRange) > 15;
+
     // Pre-filter to top 20 candidates for GPT — broad enough for nuance,
-    // small enough to keep tokens low and latency fast
-    let candidates = pool.slice(0, 20);
+    // small enough to keep tokens low and latency fast.
+    // When a price constraint is present, prioritise in-range candidates first.
+    let candidates;
+    if (priceConstraint) {
+      const inRange  = pool.filter(priceConstraint).slice(0, 16);
+      const outRange = pool.filter(c => !priceConstraint(c)).slice(0, 4);
+      candidates = [...inRange, ...outRange].slice(0, 20);
+    } else {
+      candidates = pool.slice(0, 20);
+    }
 
     if (candidates.length < 6) {
       const used = new Set(candidates.map(getCigarKey));
@@ -811,6 +1016,16 @@ exports.handler = async function (event) {
         })
       );
       candidates = candidates.concat(backup).slice(0, 20);
+    }
+
+    // Special case: 'new to cigars' — force 2 mild + 1 mild/medium
+    const isNewToCigars = queryLower.includes('new to cigar') || queryLower.includes('new to cigars') || queryLower.includes('approachable');
+    if (isNewToCigars) {
+      const mildPool    = shuffle(ALL_CIGARS.filter(c => c.strength <= 3 && !excluded.has(getCigarKey(c))));
+      const midPool     = shuffle(ALL_CIGARS.filter(c => c.strength >= 4 && c.strength <= 5 && !excluded.has(getCigarKey(c))));
+      const mildPicks   = mildPool.slice(0, 2);
+      const midPick     = midPool.slice(0, 1);
+      candidates        = [...mildPicks, ...midPick];
     }
 
     // GPT selects the best 6 from the 20 candidates and writes a why for each.

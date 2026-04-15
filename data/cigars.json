@@ -1412,7 +1412,7 @@
   {
     "name": "Hoyo de Monterrey Double Corona",
     "brand": "Hoyo de Monterrey",
-    "strength": 7,
+    "strength": 5,
     "priceRange": "$9-$13",
     "flavorNotes": [
       "Earth",
@@ -1620,7 +1620,7 @@
   {
     "name": "Acid Blue Kuba Kuba",
     "brand": "Drew Estate",
-    "strength": 5,
+    "strength": 3,
     "priceRange": "$9-$12",
     "flavorNotes": [
       "Floral",
@@ -2616,7 +2616,7 @@
   {
     "name": "Tabak Especial Dulce Toro",
     "brand": "Drew Estate",
-    "strength": 5,
+    "strength": 3,
     "priceRange": "$8-$11",
     "flavorNotes": [
       "Espresso",
@@ -3009,5 +3009,561 @@
       "Leather",
       "Spice"
     ]
+  },
+  {
+    "name": "Macanudo Cafe Hyde Park",
+    "brand": "Macanudo",
+    "strength": 2,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Macanudo Cafe Hampton Court",
+    "brand": "Macanudo",
+    "strength": 2,
+    "priceRange": "$6-$9",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Floral",
+      "Nuts"
+    ]
+  },
+  {
+    "name": "Macanudo Cafe Duke of Devon",
+    "brand": "Macanudo",
+    "strength": 1,
+    "priceRange": "$5-$7",
+    "flavorNotes": [
+      "Cream",
+      "Sweetness",
+      "Floral",
+      "Cedar"
+    ]
+  },
+  {
+    "name": "Macanudo Cafe Portofino",
+    "brand": "Macanudo",
+    "strength": 2,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Cream",
+      "Nuts",
+      "Cedar",
+      "Honey"
+    ]
+  },
+  {
+    "name": "Ashton Classic Corona",
+    "brand": "Ashton",
+    "strength": 2,
+    "priceRange": "$7-$10",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Ashton Classic Double Magnum",
+    "brand": "Ashton",
+    "strength": 2,
+    "priceRange": "$9-$13",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Honey",
+      "Nuts"
+    ]
+  },
+  {
+    "name": "Davidoff Grand Cru No. 1",
+    "brand": "Davidoff",
+    "strength": 2,
+    "priceRange": "$18-$24",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Floral"
+    ]
+  },
+  {
+    "name": "Romeo y Julieta 1875 Corona",
+    "brand": "Romeo y Julieta",
+    "strength": 2,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Sweetness",
+      "Nuts"
+    ]
+  },
+  {
+    "name": "Romeo y Julieta Reserva Real Connecticut",
+    "brand": "Romeo y Julieta",
+    "strength": 2,
+    "priceRange": "$7-$10",
+    "flavorNotes": [
+      "Cream",
+      "Honey",
+      "Cedar",
+      "Floral"
+    ]
+  },
+  {
+    "name": "Montecristo White Series Rothschilde",
+    "brand": "Montecristo",
+    "strength": 3,
+    "priceRange": "$8-$12",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "H. Upmann 1844 Connecticut Robusto",
+    "brand": "H. Upmann",
+    "strength": 2,
+    "priceRange": "$6-$9",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Honey"
+    ]
+  },
+  {
+    "name": "H. Upmann Banker Acquisition Robusto",
+    "brand": "H. Upmann",
+    "strength": 3,
+    "priceRange": "$9-$13",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Sweetness",
+      "Floral"
+    ]
+  },
+  {
+    "name": "Arturo Fuente Brevas Royale",
+    "brand": "Arturo Fuente",
+    "strength": 2,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Hoyo de Monterrey Excalibur No. 1",
+    "brand": "Hoyo de Monterrey",
+    "strength": 2,
+    "priceRange": "$7-$11",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Floral",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Hoyo de Monterrey Rothschild",
+    "brand": "Hoyo de Monterrey",
+    "strength": 2,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Honey"
+    ]
+  },
+  {
+    "name": "Nub Connecticut Robusto",
+    "brand": "Nub",
+    "strength": 3,
+    "priceRange": "$7-$10",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Perdomo Connecticut Robusto",
+    "brand": "Perdomo",
+    "strength": 3,
+    "priceRange": "$6-$9",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Honey",
+      "Nuts"
+    ]
+  },
+  {
+    "name": "CAO Connecticut Robusto",
+    "brand": "CAO",
+    "strength": 3,
+    "priceRange": "$6-$9",
+    "flavorNotes": [
+      "Cream",
+      "Nuts",
+      "Cedar",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Oliva Connecticut Reserve Robusto",
+    "brand": "Oliva",
+    "strength": 3,
+    "priceRange": "$7-$10",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Honey",
+      "Nuts"
+    ]
+  },
+  {
+    "name": "Davidoff Aniversario No. 3",
+    "brand": "Davidoff",
+    "strength": 4,
+    "priceRange": "$22-$28",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Honey"
+    ]
+  },
+  {
+    "name": "Ashton VSG Wizard",
+    "brand": "Ashton",
+    "strength": 5,
+    "priceRange": "$20-$26",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Spice",
+      "Earth"
+    ]
+  },
+  {
+    "name": "Arturo Fuente Don Carlos No. 3",
+    "brand": "Arturo Fuente",
+    "strength": 5,
+    "priceRange": "$18-$24",
+    "flavorNotes": [
+      "Cedar",
+      "Sweetness",
+      "Cream",
+      "Nuts"
+    ]
+  },
+  {
+    "name": "Montecristo Platinum Toro",
+    "brand": "Montecristo",
+    "strength": 5,
+    "priceRange": "$18-$24",
+    "flavorNotes": [
+      "Cedar",
+      "Nuts",
+      "Cream",
+      "Earth"
+    ]
+  },
+  {
+    "name": "Romeo y Julieta Vintage No. 5",
+    "brand": "Romeo y Julieta",
+    "strength": 4,
+    "priceRange": "$18-$24",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Floral",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "H. Upmann Magnum 54",
+    "brand": "H. Upmann",
+    "strength": 4,
+    "priceRange": "$20-$26",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Honey"
+    ]
+  },
+  {
+    "name": "Perdomo Habano Champagne Epicure",
+    "brand": "Perdomo",
+    "strength": 4,
+    "priceRange": "$8-$12",
+    "flavorNotes": [
+      "Cream",
+      "Honey",
+      "Cedar",
+      "Floral"
+    ]
+  },
+  {
+    "name": "Oliva Serie G Maduro Torpedo",
+    "brand": "Oliva",
+    "strength": 5,
+    "priceRange": "$7-$10",
+    "flavorNotes": [
+      "Chocolate",
+      "Cedar",
+      "Cream",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Rocky Patel Vintage 1999 Toro",
+    "brand": "Rocky Patel",
+    "strength": 5,
+    "priceRange": "$10-$14",
+    "flavorNotes": [
+      "Cedar",
+      "Cream",
+      "Nuts",
+      "Earth"
+    ]
+  },
+  {
+    "name": "Cohiba Blue Robusto",
+    "brand": "Cohiba",
+    "strength": 5,
+    "priceRange": "$18-$24",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Spice",
+      "Earth"
+    ]
+  },
+  {
+    "name": "CAO Cameroon Churchill",
+    "brand": "CAO",
+    "strength": 4,
+    "priceRange": "$8-$12",
+    "flavorNotes": [
+      "Sweetness",
+      "Cedar",
+      "Nuts",
+      "Cream"
+    ]
+  },
+  {
+    "name": "Alec Bradley American Classic Robusto",
+    "brand": "Alec Bradley",
+    "strength": 4,
+    "priceRange": "$7-$10",
+    "flavorNotes": [
+      "Cream",
+      "Cedar",
+      "Nuts",
+      "Sweetness"
+    ]
+  },
+  {
+    "name": "Villiger Export Natural",
+    "brand": "Villiger",
+    "strength": 3,
+    "priceRange": "$2-$4",
+    "flavorNotes": [
+      "Hay",
+      "Dried Fruit",
+      "Tobacco",
+      "Sweetness"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Villiger Export Maduro",
+    "brand": "Villiger",
+    "strength": 4,
+    "priceRange": "$2-$4",
+    "flavorNotes": [
+      "Dried Fruit",
+      "Cocoa",
+      "Tobacco",
+      "Earth"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Villiger Export Brasil",
+    "brand": "Villiger",
+    "strength": 4,
+    "priceRange": "$2-$4",
+    "flavorNotes": [
+      "Hay",
+      "Earth",
+      "Dried Fruit",
+      "Tobacco"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Villiger Export Sumatra",
+    "brand": "Villiger",
+    "strength": 3,
+    "priceRange": "$2-$4",
+    "flavorNotes": [
+      "Hay",
+      "Sweetness",
+      "Tobacco",
+      "Dried Fruit"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Café Crème Original",
+    "brand": "Henri Wintermans",
+    "strength": 2,
+    "priceRange": "$3-$5",
+    "flavorNotes": [
+      "Cream",
+      "Sweetness",
+      "Hay",
+      "Tobacco"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Café Crème Filter",
+    "brand": "Henri Wintermans",
+    "strength": 2,
+    "priceRange": "$3-$5",
+    "flavorNotes": [
+      "Cream",
+      "Hay",
+      "Sweetness",
+      "Tobacco"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Al Capone Sweets",
+    "brand": "Al Capone",
+    "strength": 2,
+    "priceRange": "$2-$4",
+    "flavorNotes": [
+      "Sweetness",
+      "Cream",
+      "Vanilla",
+      "Tobacco"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Al Capone Filter",
+    "brand": "Al Capone",
+    "strength": 2,
+    "priceRange": "$2-$4",
+    "flavorNotes": [
+      "Sweetness",
+      "Tobacco",
+      "Hay",
+      "Cream"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Toscano Classico",
+    "brand": "Toscano",
+    "strength": 6,
+    "priceRange": "$4-$7",
+    "flavorNotes": [
+      "Earth",
+      "Dried Fruit",
+      "Tobacco",
+      "Hay",
+      "Spice"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Toscano Antico",
+    "brand": "Toscano",
+    "strength": 7,
+    "priceRange": "$5-$8",
+    "flavorNotes": [
+      "Earth",
+      "Tobacco",
+      "Dried Fruit",
+      "Leather",
+      "Spice"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Café Noir Classic",
+    "brand": "Café Noir",
+    "strength": 3,
+    "priceRange": "$3-$5",
+    "flavorNotes": [
+      "Sweetness",
+      "Cream",
+      "Hay",
+      "Tobacco"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Parodi Ammezzati",
+    "brand": "Parodi",
+    "strength": 6,
+    "priceRange": "$3-$5",
+    "flavorNotes": [
+      "Earth",
+      "Tobacco",
+      "Dried Fruit",
+      "Spice"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Dannemann Moods",
+    "brand": "Dannemann",
+    "strength": 2,
+    "priceRange": "$3-$5",
+    "flavorNotes": [
+      "Sweetness",
+      "Cream",
+      "Hay",
+      "Tobacco"
+    ],
+    "style": "dry-cured"
+  },
+  {
+    "name": "Dannemann Espada",
+    "brand": "Dannemann",
+    "strength": 3,
+    "priceRange": "$4-$6",
+    "flavorNotes": [
+      "Hay",
+      "Dried Fruit",
+      "Sweetness",
+      "Tobacco"
+    ],
+    "style": "dry-cured"
   }
 ]
